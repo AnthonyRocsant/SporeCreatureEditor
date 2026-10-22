@@ -32,6 +32,11 @@ var current_scale: float = 1.0
 var min_part_scale: float = 0.50
 var max_part_scale: float = 2.00
 
+## Cores ativas sincronizadas com o corpo
+var current_primary_color: Color = Color(0.85, 0.45, 0.35, 1.0)
+var current_secondary_color: Color = Color(0.30, 0.15, 0.10, 1.0)
+var current_detail_color: Color = Color(0.92, 0.88, 0.78, 1.0)
+
 ## Cena e metadados da peça ativa no catálogo
 @export var active_part_scene: PackedScene
 var active_part_info: Dictionary = {
@@ -443,6 +448,9 @@ func _setup_preview_instances() -> void:
 		if _preview_mirrored_instance.has_method("set_appendage_variant"):
 			_preview_mirrored_instance.call("set_appendage_variant", active_tag)
 
+	_apply_colors_to_part(_preview_instance)
+	_apply_colors_to_part(_preview_mirrored_instance)
+
 	_disable_colliders(_preview_instance)
 	_disable_colliders(_preview_mirrored_instance)
 
@@ -456,6 +464,33 @@ func _disable_colliders(node: Node) -> void:
 		if child is CollisionShape3D or child is CollisionPolygon3D:
 			child.set_deferred("disabled", true)
 		_disable_colliders(child)
+
+func _apply_colors_to_part(part_node: Node3D) -> void:
+	if not is_instance_valid(part_node):
+		return
+	if part_node.has_method("set_colors"):
+		part_node.call("set_colors", current_primary_color, current_secondary_color, current_detail_color)
+	else:
+		if "primary_color" in part_node:
+			part_node.set("primary_color", current_primary_color)
+		if "secondary_color" in part_node:
+			part_node.set("secondary_color", current_secondary_color)
+		if "detail_color" in part_node:
+			part_node.set("detail_color", current_detail_color)
+
+func update_all_appendages_colors(p_col: Color, s_col: Color, d_col: Color) -> void:
+	current_primary_color = p_col
+	current_secondary_color = s_col
+	current_detail_color = d_col
+
+	_apply_colors_to_part(_preview_instance)
+	_apply_colors_to_part(_preview_mirrored_instance)
+
+	if creature_data:
+		for part_info in creature_data.attached_parts:
+			var node = part_info.get("node") as Node3D
+			if is_instance_valid(node):
+				_apply_colors_to_part(node)
 
 ## Adiciona um corpo de seleção na camada LAYER_PARTS para permitir Raycast sobre a peça anexada
 func _attach_selection_collider(part_node: Node3D, part_id: String) -> void:
@@ -624,6 +659,7 @@ func _confirm_attachment() -> void:
 	parent_target.add_child(part)
 	if p_tag != "" and part.has_method("set_appendage_variant"):
 		part.call("set_appendage_variant", p_tag)
+	_apply_colors_to_part(part)
 	part.global_transform = _preview_instance.global_transform
 	part.scale = Vector3.ONE * current_scale
 	_attach_selection_collider(part, base_id)
@@ -666,6 +702,7 @@ func _confirm_attachment() -> void:
 		parent_target.add_child(mirror_part)
 		if p_tag != "" and mirror_part.has_method("set_appendage_variant"):
 			mirror_part.call("set_appendage_variant", p_tag)
+		_apply_colors_to_part(mirror_part)
 		mirror_part.global_transform = _preview_mirrored_instance.global_transform
 		mirror_part.scale = Vector3.ONE * current_scale
 		_attach_selection_collider(mirror_part, mirror_id)
@@ -724,6 +761,7 @@ func reconstruct_part_from_dict(part_data: Dictionary) -> Node3D:
 	var p_tag = str(part_data.get("tag", ""))
 	if p_tag != "" and part.has_method("set_appendage_variant"):
 		part.call("set_appendage_variant", p_tag)
+	_apply_colors_to_part(part)
 
 	var xform: Transform3D = part_data.get("transform", Transform3D.IDENTITY)
 	var scale_f = float(part_data.get("scale_factor", 1.0))

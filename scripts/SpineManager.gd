@@ -889,6 +889,7 @@ func generate_mesh(update_collider: bool = true) -> void:
 
 	var new_mesh = st.commit()
 	body_mesh_instance.mesh = new_mesh
+	body_mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 
 	if body_mesh_instance is ApplyCreatureShader:
 		var mat = (body_mesh_instance as ApplyCreatureShader).get_creature_material()

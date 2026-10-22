@@ -222,6 +222,76 @@ const SKILL_CATALOG: Dictionary = {
 		"base_impact": 68.0,
 		"cooldown": 5.0,
 		"icon": "📡"
+	},
+	"#Claw_Pincer": {
+		"id": "crush_pincer",
+		"tag": "#Claw_Pincer",
+		"name": "Pinça Esmagadora",
+		"description": "Aperto demolidor de carapaça com dentes crustáceos",
+		"effect_type": "fast_combo",
+		"base_impact": 94.0,
+		"cooldown": 3.5,
+		"icon": "🦞"
+	},
+	"#Tentacle_Grip": {
+		"id": "abyssal_constrict",
+		"tag": "#Tentacle_Grip",
+		"name": "Constrição Abissal",
+		"description": "Prende o alvo com ventosas e drena mobilidade",
+		"effect_type": "dot_poison",
+		"base_impact": 86.0,
+		"cooldown": 4.0,
+		"icon": "🐙"
+	},
+	"#Tail_Scorpion": {
+		"id": "neurotoxic_sting",
+		"tag": "#Tail_Scorpion",
+		"name": "Picada Neurotóxica",
+		"description": "Injeção letal de veneno com aguilhão duplo",
+		"effect_type": "dot_poison",
+		"base_impact": 95.0,
+		"cooldown": 4.5,
+		"icon": "🦂"
+	},
+	"#Fin_Aquatic": {
+		"id": "hydro_surge",
+		"tag": "#Fin_Aquatic",
+		"name": "Arrancada Hidrodinâmica",
+		"description": "Impulso fluido cortante com quilha cartilaginosa",
+		"effect_type": "linear_knockback",
+		"base_impact": 84.0,
+		"cooldown": 3.8,
+		"icon": "🦈"
+	},
+	"#Horn_Rhino": {
+		"id": "demolishing_charge",
+		"tag": "#Horn_Rhino",
+		"name": "Carga Demolidora",
+		"description": "Avanço imparável que arremessa qualquer inimigo",
+		"effect_type": "linear_knockback",
+		"base_impact": 98.0,
+		"cooldown": 5.0,
+		"icon": "🦏"
+	},
+	"#Wing_Seraph": {
+		"id": "seraph_ascension",
+		"tag": "#Wing_Seraph",
+		"name": "Ascensão Serena",
+		"description": "Bate de asas sagrado com vendaval radiante e elevação máxima",
+		"effect_type": "aerial_dash",
+		"base_impact": 92.0,
+		"cooldown": 4.0,
+		"icon": "🪽"
+	},
+	"#Eye_Cyclops": {
+		"id": "dread_gaze",
+		"tag": "#Eye_Cyclops",
+		"name": "Olhar Aterrorizante",
+		"description": "Fixa o olho titânico paralisando alvos em cone frontal",
+		"effect_type": "aoe_frontal_stun",
+		"base_impact": 85.0,
+		"cooldown": 5.5,
+		"icon": "🧿"
 	}
 }
 

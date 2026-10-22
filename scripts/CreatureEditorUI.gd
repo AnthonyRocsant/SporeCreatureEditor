@@ -69,6 +69,7 @@ var _category_buttons: Dictionary = {}
 @onready var option_skin_pattern: OptionButton = %OptionSkinPattern
 @onready var primary_color_picker: ColorPickerButton = %PrimaryColorPicker
 @onready var secondary_color_picker: ColorPickerButton = %SecondaryColorPicker
+@onready var detail_color_picker: ColorPickerButton = %DetailColorPicker
 @onready var slider_pattern_blend: HSlider = %SliderPatternBlend
 @onready var lbl_pattern_blend_val: Label = %LblPatternBlendVal
 @onready var slider_texture_scale: HSlider = %SliderTextureScale
@@ -252,6 +253,9 @@ func _setup_signals() -> void:
 		primary_color_picker.color_changed.connect(_on_primary_color_changed)
 	if secondary_color_picker and not secondary_color_picker.color_changed.is_connected(_on_secondary_color_changed):
 		secondary_color_picker.color_changed.connect(_on_secondary_color_changed)
+	if detail_color_picker and not detail_color_picker.color_changed.is_connected(_on_detail_color_changed):
+		detail_color_picker.color_changed.connect(_on_detail_color_changed)
+	_sync_appendages_colors()
 	if slider_pattern_blend and not slider_pattern_blend.value_changed.is_connected(_on_pattern_blend_changed):
 		slider_pattern_blend.value_changed.connect(_on_pattern_blend_changed)
 	if slider_texture_scale and not slider_texture_scale.value_changed.is_connected(_on_texture_scale_changed):
@@ -848,6 +852,42 @@ const APPENDAGE_CATALOG: Array[Dictionary] = [
 		"carapace_defense": 3.0,
 		"desc": "Perna fina quitinosa de alta rapidez. Habilidade: Salto Articulado. Custo: 8 + escala."
 	},
+	{
+		"category_id": "leg",
+		"category_name": "Patas",
+		"category_icon": "🦵",
+		"id": "claw_pincer",
+		"name": "Pinça Crustácea Titânica",
+		"icon": "🦞",
+		"scene": "res://scenes/appendages/ClawPincer.tscn",
+		"type": "leg",
+		"category": "attack",
+		"tag": "#Claw_Pincer",
+		"mass": 1.9,
+		"base_damage": 18.0,
+		"leg_force": 3.5,
+		"wing_area": 0.0,
+		"carapace_defense": 8.0,
+		"desc": "Pinça colossal de caranguejo com dentes de esmagamento. Habilidade: Pinça Esmagadora. Custo: 8 + escala."
+	},
+	{
+		"category_id": "leg",
+		"category_name": "Patas",
+		"category_icon": "🦵",
+		"id": "tentacle_grip",
+		"name": "Tentáculo Abissal",
+		"icon": "🐙",
+		"scene": "res://scenes/appendages/TentacleSuction.tscn",
+		"type": "leg",
+		"category": "leg",
+		"tag": "#Tentacle_Grip",
+		"mass": 1.3,
+		"base_damage": 11.0,
+		"leg_force": 4.0,
+		"wing_area": 0.0,
+		"carapace_defense": 2.0,
+		"desc": "Tentáculo sinuoso com ventosas duplas aderentes. Habilidade: Constrição Abissal. Custo: 8 + escala."
+	},
 
 	# 👁️ OLHOS & SENTIDOS
 	{
@@ -921,6 +961,24 @@ const APPENDAGE_CATALOG: Array[Dictionary] = [
 		"wing_area": 0.0,
 		"carapace_defense": 1.0,
 		"desc": "Antena biológica que detecta vibrações e ecolocalização. Custo: 2 pts."
+	},
+	{
+		"category_id": "eye",
+		"category_name": "Olhos",
+		"category_icon": "👁️",
+		"id": "eye_cyclops",
+		"name": "Olho Ciclópeo Colossal",
+		"icon": "🧿",
+		"scene": "res://scenes/appendages/EyeCyclops.tscn",
+		"type": "eye",
+		"category": "eye",
+		"tag": "#Eye_Cyclops",
+		"mass": 0.6,
+		"base_damage": 0.0,
+		"leg_force": 0.0,
+		"wing_area": 0.0,
+		"carapace_defense": 3.0,
+		"desc": "Olho único titânico com crista superciliar pesada e chifres orbitais. Habilidade: Olhar Aterrorizante. Custo: 2 pts."
 	},
 
 	# 🦎 RABOS & CAUDAS
@@ -996,6 +1054,24 @@ const APPENDAGE_CATALOG: Array[Dictionary] = [
 		"carapace_defense": 2.0,
 		"desc": "Cauda com leque aerodinâmico para equilíbrio e manobras ágeis. Custo: 7 + escala."
 	},
+	{
+		"category_id": "tail",
+		"category_name": "Rabos",
+		"category_icon": "🦎",
+		"id": "tail_scorpion",
+		"name": "Cauda de Escorpião Imperador",
+		"icon": "🦂",
+		"scene": "res://scenes/appendages/TailScorpion.tscn",
+		"type": "tail",
+		"category": "tail",
+		"tag": "#Tail_Scorpion",
+		"mass": 1.3,
+		"base_damage": 17.0,
+		"leg_force": 0.0,
+		"wing_area": 0.0,
+		"carapace_defense": 6.0,
+		"desc": "5 segmentos blindados e aguilhão duplo com veneno neurotóxico. Habilidade: Picada Neurotóxica. Custo: 7 + escala."
+	},
 
 	# 🪽 ASAS & VOO
 	{
@@ -1051,6 +1127,24 @@ const APPENDAGE_CATALOG: Array[Dictionary] = [
 		"wing_area": 2.8,
 		"carapace_defense": 1.5,
 		"desc": "Asa com remiges de penas longas. Planagem suave e estável. Custo: 12 + escala."
+	},
+	{
+		"category_id": "wing",
+		"category_name": "Asas",
+		"category_icon": "🪽",
+		"id": "wing_seraph",
+		"name": "Asa Serafim Majestosa",
+		"icon": "🪽",
+		"scene": "res://scenes/appendages/WingSeraph.tscn",
+		"type": "wing",
+		"category": "wing",
+		"tag": "#Wing_Seraph",
+		"mass": 1.1,
+		"base_damage": 5.0,
+		"leg_force": 0.0,
+		"wing_area": 3.5,
+		"carapace_defense": 3.0,
+		"desc": "Asa sagrada multicamadas com rêmiges douradas. Voo supremo e manobrabilidade. Custo: 12 + escala."
 	},
 
 	# ⚔️ DEFESA & CHIFRES
@@ -1125,6 +1219,42 @@ const APPENDAGE_CATALOG: Array[Dictionary] = [
 		"wing_area": 0.0,
 		"carapace_defense": 3.0,
 		"desc": "Lâmina curva afiada para ombros ou membros. Habilidade: Golpe em Corte. Custo: 6 + escala."
+	},
+	{
+		"category_id": "defense",
+		"category_name": "Defesa",
+		"category_icon": "⚔️",
+		"id": "fin_aquatic",
+		"name": "Barbatana Aquática / Quilha",
+		"icon": "🦈",
+		"scene": "res://scenes/appendages/FinAquatic.tscn",
+		"type": "spike",
+		"category": "defense",
+		"tag": "#Fin_Aquatic",
+		"mass": 0.7,
+		"base_damage": 8.0,
+		"leg_force": 0.0,
+		"wing_area": 1.5,
+		"carapace_defense": 6.0,
+		"desc": "Barbatana hidrodinâmica com raios cartilaginosos. Aumenta hidrodinâmica e estabilidade. Custo: 6 + escala."
+	},
+	{
+		"category_id": "defense",
+		"category_name": "Defesa",
+		"category_icon": "⚔️",
+		"id": "horn_rhino",
+		"name": "Chifre Nasal de Rinoceronte",
+		"icon": "🦏",
+		"scene": "res://scenes/appendages/HornRhino.tscn",
+		"type": "spike",
+		"category": "attack",
+		"tag": "#Horn_Rhino",
+		"mass": 1.5,
+		"base_damage": 17.0,
+		"leg_force": 0.0,
+		"wing_area": 0.0,
+		"carapace_defense": 8.0,
+		"desc": "Chifre maciço de queratina compactada sobre calo basal. Habilidade: Carga Demolidora. Custo: 6 + escala."
 	}
 ]
 
@@ -1483,10 +1613,22 @@ func _on_roughness_changed(value: float) -> void:
 func _on_primary_color_changed(color: Color) -> void:
 	if body_mesh and body_mesh.has_method("set_base_color"):
 		body_mesh.call("set_base_color", color)
+	_sync_appendages_colors()
 
 func _on_secondary_color_changed(color: Color) -> void:
 	if body_mesh and body_mesh.has_method("set_secondary_color"):
 		body_mesh.call("set_secondary_color", color)
+	_sync_appendages_colors()
+
+func _on_detail_color_changed(_color: Color) -> void:
+	_sync_appendages_colors()
+
+func _sync_appendages_colors() -> void:
+	if attachment_system:
+		var p_col = primary_color_picker.color if primary_color_picker else Color(0.85, 0.45, 0.35)
+		var s_col = secondary_color_picker.color if secondary_color_picker else Color(0.3, 0.15, 0.1)
+		var d_col = detail_color_picker.color if detail_color_picker else Color(0.92, 0.88, 0.78)
+		attachment_system.update_all_appendages_colors(p_col, s_col, d_col)
 
 func _on_texture_scale_changed(value: float) -> void:
 	if lbl_texture_scale_val:

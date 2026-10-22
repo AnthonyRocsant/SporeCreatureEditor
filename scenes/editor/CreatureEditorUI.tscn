@@ -476,6 +476,17 @@ custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 color = Color(0.3, 0.15, 0.1, 1)
 
+[node name="LblDetail" type="Label" parent="PaintPanel/Scroll/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Cor de Detalhes (Garras/Chifres):"
+
+[node name="DetailColorPicker" type="ColorPickerButton" parent="PaintPanel/Scroll/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+color = Color(0.92, 0.88, 0.78, 1)
+
 [node name="HBoxBlend" type="HBoxContainer" parent="PaintPanel/Scroll/Margin/VBox"]
 layout_mode = 2
 

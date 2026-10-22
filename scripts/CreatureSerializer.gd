@@ -344,6 +344,7 @@ func _serialize_skin_shader() -> Dictionary:
 	var result = {
 		"base_color": [0.85, 0.45, 0.35, 1.0],
 		"secondary_color": [0.30, 0.15, 0.10, 1.0],
+		"detail_color": [0.92, 0.88, 0.78, 1.0],
 		"texture_scale": 2.0,
 		"sss_strength": 0.3,
 		"sss_translucency": 0.25,
@@ -351,6 +352,9 @@ func _serialize_skin_shader() -> Dictionary:
 		"roughness": 0.5,
 		"normal_scale": 1.0
 	}
+	if attachment_system:
+		var dc = attachment_system.current_detail_color
+		result["detail_color"] = [dc.r, dc.g, dc.b, dc.a]
 	if body_mesh and body_mesh.has_method("get_creature_material"):
 		var mat: ShaderMaterial = body_mesh.call("get_creature_material")
 		if mat:
@@ -382,6 +386,7 @@ func _deserialize_skin_shader(skin_data: Dictionary) -> void:
 		return
 	var bc_arr: Array = skin_data.get("base_color", [0.85, 0.45, 0.35, 1.0])
 	var sc_arr: Array = skin_data.get("secondary_color", [0.30, 0.15, 0.10, 1.0])
+	var dc_arr: Array = skin_data.get("detail_color", [0.92, 0.88, 0.78, 1.0])
 	var tex_scale: float = float(skin_data.get("texture_scale", 2.0))
 	var sss_str: float = float(skin_data.get("sss_strength", 0.3))
 	var sss_trans: float = float(skin_data.get("sss_translucency", 0.25))
@@ -391,6 +396,10 @@ func _deserialize_skin_shader(skin_data: Dictionary) -> void:
 
 	var bc = _array_to_color(bc_arr)
 	var sc = _array_to_color(sc_arr)
+	var dc = _array_to_color(dc_arr)
+
+	if attachment_system:
+		attachment_system.update_all_appendages_colors(bc, sc, dc)
 
 	if body_mesh.has_method("set_base_color"):
 		body_mesh.call("set_base_color", bc)

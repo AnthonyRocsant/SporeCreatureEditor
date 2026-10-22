@@ -190,7 +190,6 @@ void fragment() {
 	vec3 rim_sheen = mix(tint_result, sss_color.rgb, 0.6) * fresnel * (0.35 * (1.0 + sss_translucency));
 
 	ALBEDO = tint_result + rim_sheen;
-	ALPHA = 1.0;
 	EMISSION = pat_emission;
 
 	// 3. Normal Map: textura externa ou micro-relevo procedural de acordo com o padrão ativo

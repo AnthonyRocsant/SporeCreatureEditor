@@ -11,16 +11,42 @@ extends Node3D
 ## - Caudas segmentadas com osteodermos dorsais, bulbo bioluminescente e ferrão curvo
 ## - Olhos orgânicos com pálpebras carnudas, esclera vítrea, íris âmbar e brilho especular
 
-@export_enum("leg", "leg_hoof", "leg_insect", "wing", "wing_insect", "wing_feather",
+@export_enum("leg", "leg_hoof", "leg_insect", "claw_pincer",
+	"wing", "wing_insect", "wing_feather", "wing_seraph",
 	"mouth_carnivore", "mouth_herbivore", "mouth_insectoid", "mouth_beak",
-	"horn", "horn_antler", "spike_dorsal", "blade_bone",
-	"tail", "tail_club", "tail_feather",
-	"eye", "eye_compound", "eye_stalk", "antenna_sensory")
+	"horn", "horn_antler", "horn_rhino", "spike_dorsal", "blade_bone", "fin_aquatic",
+	"tail", "tail_club", "tail_feather", "tail_scorpion", "tentacle",
+	"eye", "eye_compound", "eye_stalk", "eye_cyclops", "antenna_sensory")
 var appendage_kind: String = "leg":
 	set(value):
 		appendage_kind = value
 		if is_inside_tree():
 			build_visuals()
+
+## Cores sincronizadas com o corpo da criatura (estilo Spore)
+@export var primary_color: Color = Color(0.85, 0.45, 0.35, 1.0):
+	set(value):
+		primary_color = value
+		if is_inside_tree():
+			build_visuals()
+
+@export var secondary_color: Color = Color(0.30, 0.15, 0.10, 1.0):
+	set(value):
+		secondary_color = value
+		if is_inside_tree():
+			build_visuals()
+
+@export var detail_color: Color = Color(0.92, 0.88, 0.78, 1.0):
+	set(value):
+		detail_color = value
+		if is_inside_tree():
+			build_visuals()
+
+func set_colors(p_col: Color, s_col: Color, d_col: Color = Color(0.92, 0.88, 0.78, 1.0)) -> void:
+	primary_color = p_col
+	secondary_color = s_col
+	detail_color = d_col
+	build_visuals()
 
 var _visual_root: Node3D = null
 
@@ -43,14 +69,20 @@ func set_appendage_variant(variant_tag: String) -> void:
 			appendage_kind = "wing_insect"
 		"#Wing_Feather":
 			appendage_kind = "wing_feather"
+		"#Wing_Seraph":
+			appendage_kind = "wing_seraph"
 		"#Horn_Frontal":
 			appendage_kind = "horn"
 		"#Horn_Antler":
 			appendage_kind = "horn_antler"
+		"#Horn_Rhino":
+			appendage_kind = "horn_rhino"
 		"#Spike_Dorsal":
 			appendage_kind = "spike_dorsal"
 		"#Blade_Bone":
 			appendage_kind = "blade_bone"
+		"#Fin_Aquatic":
+			appendage_kind = "fin_aquatic"
 		"#Tail_Stinger":
 			appendage_kind = "tail"
 		"#Tail_Heavy":
@@ -59,8 +91,14 @@ func set_appendage_variant(variant_tag: String) -> void:
 			appendage_kind = "tail_club"
 		"#Tail_Feather":
 			appendage_kind = "tail_feather"
+		"#Tail_Scorpion":
+			appendage_kind = "tail_scorpion"
+		"#Tentacle_Grip":
+			appendage_kind = "tentacle"
 		"#Claw_Front", "#Claw_Heavy":
 			appendage_kind = "leg"
+		"#Claw_Pincer":
+			appendage_kind = "claw_pincer"
 		"#Leg_Hoof":
 			appendage_kind = "leg_hoof"
 		"#Leg_Insect":
@@ -71,6 +109,8 @@ func set_appendage_variant(variant_tag: String) -> void:
 			appendage_kind = "eye_compound"
 		"#Eye_Stalk":
 			appendage_kind = "eye_stalk"
+		"#Eye_Cyclops":
+			appendage_kind = "eye_cyclops"
 		"#Antenna_Sensory":
 			appendage_kind = "antenna_sensory"
 	build_visuals()
@@ -96,12 +136,16 @@ func build_visuals() -> void:
 			_build_sculpted_hoof_leg(_visual_root)
 		"leg_insect":
 			_build_sculpted_insect_leg(_visual_root)
+		"claw_pincer":
+			_build_sculpted_claw_pincer(_visual_root)
 		"wing":
 			_build_sculpted_wing(_visual_root)
 		"wing_insect":
 			_build_sculpted_insect_wing(_visual_root)
 		"wing_feather":
 			_build_sculpted_feather_wing(_visual_root)
+		"wing_seraph":
+			_build_sculpted_seraph_wing(_visual_root)
 		"mouth_carnivore":
 			_build_sculpted_mouth(_visual_root, false)
 		"mouth_herbivore":
@@ -114,22 +158,32 @@ func build_visuals() -> void:
 			_build_sculpted_horn(_visual_root)
 		"horn_antler":
 			_build_sculpted_antler_horn(_visual_root)
+		"horn_rhino":
+			_build_sculpted_rhino_horn(_visual_root)
 		"spike_dorsal":
 			_build_sculpted_dorsal_spike(_visual_root)
 		"blade_bone":
 			_build_sculpted_bone_blade(_visual_root)
+		"fin_aquatic":
+			_build_sculpted_aquatic_fin(_visual_root)
 		"tail":
 			_build_sculpted_tail(_visual_root)
 		"tail_club":
 			_build_sculpted_club_tail(_visual_root)
 		"tail_feather":
 			_build_sculpted_feather_tail(_visual_root)
+		"tail_scorpion":
+			_build_sculpted_scorpion_tail(_visual_root)
+		"tentacle":
+			_build_sculpted_tentacle(_visual_root)
 		"eye":
 			_build_sculpted_eye(_visual_root)
 		"eye_compound":
 			_build_sculpted_compound_eye(_visual_root)
 		"eye_stalk":
 			_build_sculpted_stalk_eye(_visual_root)
+		"eye_cyclops":
+			_build_sculpted_cyclops_eye(_visual_root)
 		"antenna_sensory":
 			_build_sculpted_antenna(_visual_root)
 
@@ -137,9 +191,9 @@ func build_visuals() -> void:
 # 1. PATA DIGITÍGRADA MUSCULAR COM GARRAS CURVAS (Orientada para o CHÃO: -Y)
 # ==============================================================================
 func _build_sculpted_leg(root: Node3D) -> void:
-	var mat_skin = _make_organic_material(Color(0.58, 0.34, 0.25), 0.55, 0.05, Color(0.9, 0.3, 0.15), 0.35)
-	var mat_scales = _make_organic_material(Color(0.32, 0.20, 0.15), 0.40, 0.10)
-	var mat_claw = _make_keratin_material(Color(0.14, 0.12, 0.10), Color(0.88, 0.84, 0.72))
+	var mat_skin = _make_organic_material(primary_color, 0.55, 0.05, primary_color.lightened(0.2), 0.35)
+	var mat_scales = _make_organic_material(secondary_color, 0.40, 0.10)
+	var mat_claw = _make_keratin_material(secondary_color.darkened(0.4), detail_color)
 
 	var pivot = Node3D.new()
 	pivot.name = "LegPivot"
@@ -232,14 +286,14 @@ func _build_sculpted_leg(root: Node3D) -> void:
 # 2. ASA DRACÔNICA / WYVERN MAJESTOSA COM FALANGES E MEMBRANA TRANSLÚCIDA
 # ==============================================================================
 func _build_sculpted_wing(root: Node3D) -> void:
-	var mat_bone = _make_organic_material(Color(0.28, 0.18, 0.14), 0.40, 0.12)
-	var mat_claw = _make_keratin_material(Color(0.12, 0.10, 0.08), Color(0.92, 0.88, 0.78))
+	var mat_bone = _make_organic_material(primary_color.darkened(0.15), 0.40, 0.12)
+	var mat_claw = _make_keratin_material(secondary_color.darkened(0.4), detail_color)
 	var mat_membrane = StandardMaterial3D.new()
 	mat_membrane.cull_mode = BaseMaterial3D.CULL_DISABLED
-	mat_membrane.albedo_color = Color(0.72, 0.20, 0.16, 0.94)
+	mat_membrane.albedo_color = secondary_color
 	mat_membrane.roughness = 0.42
 	mat_membrane.backlight_enabled = true
-	mat_membrane.backlight = Color(0.98, 0.45, 0.22)
+	mat_membrane.backlight = primary_color.lightened(0.2)
 
 	var wing_pivot = Node3D.new()
 	wing_pivot.name = "WingRoot"
@@ -337,12 +391,12 @@ func _build_sculpted_wing(root: Node3D) -> void:
 # ==============================================================================
 func _build_sculpted_mouth(root: Node3D, is_herbivore: bool) -> void:
 	var mat_skin = _make_organic_material(
-		Color(0.38, 0.52, 0.28) if is_herbivore else Color(0.62, 0.24, 0.20),
+		primary_color.darkened(0.1) if is_herbivore else primary_color,
 		0.48, 0.05
 	)
-	var mat_gum = _make_organic_material(Color(0.75, 0.22, 0.28), 0.25, 0.0)
-	var mat_tooth = _make_keratin_material(Color(0.95, 0.92, 0.82), Color(0.98, 0.96, 0.90))
-	var mat_beak = _make_keratin_material(Color(0.24, 0.20, 0.15), Color(0.45, 0.38, 0.28))
+	var mat_gum = _make_organic_material(Color(0.75, 0.22, 0.28).lerp(primary_color, 0.25), 0.25, 0.0)
+	var mat_tooth = _make_keratin_material(secondary_color.darkened(0.2), detail_color)
+	var mat_beak = _make_keratin_material(secondary_color, detail_color)
 
 	var jaw_root = Node3D.new()
 	jaw_root.name = "JawRoot"
@@ -415,8 +469,8 @@ func _build_sculpted_mouth(root: Node3D, is_herbivore: bool) -> void:
 # 4. CHIFRE CURVO DE QUERATINA COM ROSETA BASAL E ESPINHOS LATERAIS
 # ==============================================================================
 func _build_sculpted_horn(root: Node3D) -> void:
-	var mat_base = _make_organic_material(Color(0.32, 0.24, 0.18), 0.55, 0.05)
-	var mat_horn = _make_keratin_material(Color(0.18, 0.15, 0.12), Color(0.85, 0.80, 0.68))
+	var mat_base = _make_organic_material(primary_color.darkened(0.15), 0.55, 0.05)
+	var mat_horn = _make_keratin_material(secondary_color.darkened(0.3), detail_color)
 
 	# Roseta óssea na base
 	var base_pts: Array[Vector3] = [
@@ -452,14 +506,14 @@ func _build_sculpted_horn(root: Node3D) -> void:
 # 5. CAUDA SEGMENTADA COM CLAVA ÓSSEA, BULBO VENENOSO BIOLUMINESCENTE E FERRÃO
 # ==============================================================================
 func _build_sculpted_tail(root: Node3D) -> void:
-	var mat_armor = _make_organic_material(Color(0.26, 0.34, 0.22), 0.42, 0.12)
-	var mat_stinger = _make_keratin_material(Color(0.12, 0.08, 0.14), Color(0.35, 0.15, 0.42))
+	var mat_armor = _make_organic_material(secondary_color, 0.42, 0.12)
+	var mat_stinger = _make_keratin_material(secondary_color.darkened(0.5), detail_color)
 
 	var mat_venom = StandardMaterial3D.new()
-	mat_venom.albedo_color = Color(0.55, 0.15, 0.85)
+	mat_venom.albedo_color = detail_color
 	mat_venom.roughness = 0.2
 	mat_venom.emission_enabled = true
-	mat_venom.emission = Color(0.65, 0.20, 0.95)
+	mat_venom.emission = detail_color
 	mat_venom.emission_energy_multiplier = 1.4
 
 	var tail_root = Node3D.new()
@@ -510,7 +564,7 @@ func _build_sculpted_tail(root: Node3D) -> void:
 # 6. OLHO ORGÂNICO REALISTA COM PÁLPEBRAS, ÍRIS ÂMBAR E BRILHO DE CÓRNEA
 # ==============================================================================
 func _build_sculpted_eye(root: Node3D) -> void:
-	var mat_lid = _make_organic_material(Color(0.52, 0.26, 0.22), 0.55, 0.05)
+	var mat_lid = _make_organic_material(primary_color, 0.55, 0.05)
 
 	var mat_sclera = StandardMaterial3D.new()
 	mat_sclera.albedo_color = Color(0.96, 0.95, 0.90)
@@ -521,10 +575,10 @@ func _build_sculpted_eye(root: Node3D) -> void:
 	mat_sclera.clearcoat_roughness = 0.04
 
 	var mat_iris = StandardMaterial3D.new()
-	mat_iris.albedo_color = Color(0.95, 0.62, 0.12)
+	mat_iris.albedo_color = secondary_color
 	mat_iris.roughness = 0.12
 	mat_iris.emission_enabled = true
-	mat_iris.emission = Color(0.85, 0.45, 0.05)
+	mat_iris.emission = secondary_color.lightened(0.25)
 	mat_iris.emission_energy_multiplier = 0.45
 
 	var mat_pupil = StandardMaterial3D.new()
@@ -593,9 +647,9 @@ func _build_sculpted_eye(root: Node3D) -> void:
 
 # --- A. PATA COM CASCO BLINDADO (Herbívoros / Quadrúpedes pesados) ---
 func _build_sculpted_hoof_leg(root: Node3D) -> void:
-	var mat_skin = _make_organic_material(Color(0.48, 0.40, 0.32), 0.60, 0.05)
-	var mat_hoof = _make_keratin_material(Color(0.12, 0.10, 0.08), Color(0.28, 0.24, 0.20))
-	var mat_plate = _make_organic_material(Color(0.35, 0.28, 0.22), 0.40, 0.10)
+	var mat_skin = _make_organic_material(primary_color, 0.60, 0.05)
+	var mat_hoof = _make_keratin_material(secondary_color.darkened(0.4), detail_color)
+	var mat_plate = _make_organic_material(secondary_color, 0.40, 0.10)
 
 	var pivot = Node3D.new()
 	pivot.name = "HoofPivot"
@@ -642,9 +696,9 @@ func _build_sculpted_hoof_leg(root: Node3D) -> void:
 
 # --- B. PATA INSETÓIDE QUITINOSA ARTICULADA ---
 func _build_sculpted_insect_leg(root: Node3D) -> void:
-	var mat_chitin = _make_organic_material(Color(0.18, 0.22, 0.16), 0.32, 0.15)
-	var mat_joint = _make_organic_material(Color(0.38, 0.18, 0.12), 0.25, 0.05)
-	var mat_claw = _make_keratin_material(Color(0.08, 0.08, 0.08), Color(0.35, 0.30, 0.25))
+	var mat_chitin = _make_organic_material(secondary_color, 0.32, 0.15)
+	var mat_joint = _make_organic_material(primary_color.darkened(0.2), 0.25, 0.05)
+	var mat_claw = _make_keratin_material(secondary_color.darkened(0.5), detail_color)
 
 	var pivot = Node3D.new()
 	pivot.name = "InsectLegPivot"
@@ -701,13 +755,13 @@ func _build_sculpted_insect_leg(root: Node3D) -> void:
 
 # --- C. BOCA INSETÓIDE (Quelíceras cortantes e glândula de veneno) ---
 func _build_sculpted_insectoid_mouth(root: Node3D) -> void:
-	var mat_chitin = _make_organic_material(Color(0.20, 0.16, 0.12), 0.30, 0.20)
-	var mat_mandible = _make_keratin_material(Color(0.10, 0.08, 0.05), Color(0.55, 0.40, 0.25))
+	var mat_chitin = _make_organic_material(primary_color.darkened(0.2), 0.30, 0.20)
+	var mat_mandible = _make_keratin_material(secondary_color.darkened(0.4), detail_color)
 
 	var mat_acid = StandardMaterial3D.new()
-	mat_acid.albedo_color = Color(0.25, 0.95, 0.15)
+	mat_acid.albedo_color = secondary_color.lightened(0.3)
 	mat_acid.emission_enabled = true
-	mat_acid.emission = Color(0.30, 1.0, 0.20)
+	mat_acid.emission = secondary_color.lightened(0.4)
 	mat_acid.emission_energy_multiplier = 1.3
 	mat_acid.roughness = 0.15
 
@@ -756,8 +810,8 @@ func _build_sculpted_insectoid_mouth(root: Node3D) -> void:
 
 # --- D. BICO DE AVE DE RAPINA (Curvo e afiado com cera e narinas) ---
 func _build_sculpted_beak_mouth(root: Node3D) -> void:
-	var mat_cere = _make_organic_material(Color(0.85, 0.55, 0.15), 0.40, 0.05)
-	var mat_beak = _make_keratin_material(Color(0.20, 0.16, 0.10), Color(0.92, 0.76, 0.25))
+	var mat_cere = _make_organic_material(primary_color, 0.40, 0.05)
+	var mat_beak = _make_keratin_material(secondary_color, detail_color)
 
 	var beak_root = Node3D.new()
 	beak_root.name = "BeakRoot"
@@ -793,14 +847,14 @@ func _build_sculpted_beak_mouth(root: Node3D) -> void:
 
 # --- E. OLHO COMPOSTO INSETÓIDE (Facetado esmeralda com brilho) ---
 func _build_sculpted_compound_eye(root: Node3D) -> void:
-	var mat_socket = _make_organic_material(Color(0.20, 0.18, 0.14), 0.35, 0.10)
+	var mat_socket = _make_organic_material(primary_color.darkened(0.2), 0.35, 0.10)
 
 	var mat_facet = StandardMaterial3D.new()
-	mat_facet.albedo_color = Color(0.12, 0.75, 0.35)
+	mat_facet.albedo_color = secondary_color
 	mat_facet.metallic = 0.35
 	mat_facet.roughness = 0.12
 	mat_facet.emission_enabled = true
-	mat_facet.emission = Color(0.10, 0.65, 0.28)
+	mat_facet.emission = secondary_color.lightened(0.25)
 	mat_facet.emission_energy_multiplier = 0.6
 
 	var eye_root = Node3D.new()
@@ -831,7 +885,7 @@ func _build_sculpted_compound_eye(root: Node3D) -> void:
 
 # --- F. OLHO PEDUNCULADO (Sobre haste móvel) ---
 func _build_sculpted_stalk_eye(root: Node3D) -> void:
-	var mat_stalk = _make_organic_material(Color(0.55, 0.42, 0.30), 0.50, 0.05)
+	var mat_stalk = _make_organic_material(primary_color, 0.50, 0.05)
 	var mat_sclera = StandardMaterial3D.new()
 	mat_sclera.albedo_color = Color(0.95, 0.94, 0.90)
 	mat_sclera.roughness = 0.04
@@ -877,11 +931,11 @@ func _build_sculpted_stalk_eye(root: Node3D) -> void:
 
 # --- G. ANTENA SENSORIAL BIOLUMINESCENTE ---
 func _build_sculpted_antenna(root: Node3D) -> void:
-	var mat_ant = _make_organic_material(Color(0.24, 0.22, 0.18), 0.40, 0.10)
+	var mat_ant = _make_organic_material(secondary_color, 0.40, 0.10)
 	var mat_glow = StandardMaterial3D.new()
-	mat_glow.albedo_color = Color(0.25, 0.85, 1.0)
+	mat_glow.albedo_color = detail_color
 	mat_glow.emission_enabled = true
-	mat_glow.emission = Color(0.35, 0.90, 1.0)
+	mat_glow.emission = detail_color
 	mat_glow.emission_energy_multiplier = 1.6
 
 	var ant_root = Node3D.new()
@@ -911,8 +965,8 @@ func _build_sculpted_antenna(root: Node3D) -> void:
 
 # --- H. CAUDA COM CLAVA ÓSSEA / MAÇA DE ANQUILOSSAURO ---
 func _build_sculpted_club_tail(root: Node3D) -> void:
-	var mat_skin = _make_organic_material(Color(0.40, 0.34, 0.26), 0.55, 0.05)
-	var mat_bone = _make_keratin_material(Color(0.18, 0.16, 0.14), Color(0.75, 0.70, 0.60))
+	var mat_skin = _make_organic_material(primary_color, 0.55, 0.05)
+	var mat_bone = _make_keratin_material(secondary_color.darkened(0.2), detail_color)
 
 	var tail_root = Node3D.new()
 	tail_root.name = "ClubTailRoot"
@@ -951,9 +1005,9 @@ func _build_sculpted_club_tail(root: Node3D) -> void:
 
 # --- I. LEME EMPLUMADO / CAUDA DE PENAS ---
 func _build_sculpted_feather_tail(root: Node3D) -> void:
-	var mat_tail = _make_organic_material(Color(0.42, 0.30, 0.25), 0.50, 0.05)
+	var mat_tail = _make_organic_material(primary_color, 0.50, 0.05)
 	var mat_feather = StandardMaterial3D.new()
-	mat_feather.albedo_color = Color(0.85, 0.30, 0.20)
+	mat_feather.albedo_color = secondary_color
 	mat_feather.roughness = 0.35
 
 	var tail_root = Node3D.new()
@@ -983,9 +1037,9 @@ func _build_sculpted_feather_tail(root: Node3D) -> void:
 
 # --- J. ASA INSETÓIDE DUPLA (Libélula translúcida) ---
 func _build_sculpted_insect_wing(root: Node3D) -> void:
-	var mat_vein = _make_organic_material(Color(0.15, 0.18, 0.12), 0.3, 0.2)
+	var mat_vein = _make_organic_material(secondary_color.darkened(0.3), 0.3, 0.2)
 	var mat_membrane = StandardMaterial3D.new()
-	mat_membrane.albedo_color = Color(0.65, 0.88, 0.95, 0.65)
+	mat_membrane.albedo_color = Color(secondary_color.r, secondary_color.g, secondary_color.b, 0.65)
 	mat_membrane.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat_membrane.cull_mode = BaseMaterial3D.CULL_DISABLED
 	mat_membrane.roughness = 0.1
@@ -1029,9 +1083,9 @@ func _build_sculpted_insect_wing(root: Node3D) -> void:
 
 # --- K. ASA EMPLUMADA DE AVE ---
 func _build_sculpted_feather_wing(root: Node3D) -> void:
-	var mat_arm = _make_organic_material(Color(0.65, 0.55, 0.45), 0.5, 0.05)
+	var mat_arm = _make_organic_material(primary_color, 0.5, 0.05)
 	var mat_feathers = StandardMaterial3D.new()
-	mat_feathers.albedo_color = Color(0.92, 0.88, 0.82)
+	mat_feathers.albedo_color = secondary_color
 	mat_feathers.roughness = 0.4
 
 	var wing_pivot = Node3D.new()
@@ -1068,7 +1122,7 @@ func _build_sculpted_feather_wing(root: Node3D) -> void:
 
 # --- L. GALHADA / CHIFRE RAMIFICADO DE CERVO ---
 func _build_sculpted_antler_horn(root: Node3D) -> void:
-	var mat_antler = _make_keratin_material(Color(0.25, 0.20, 0.16), Color(0.85, 0.80, 0.70))
+	var mat_antler = _make_keratin_material(secondary_color.darkened(0.3), detail_color)
 
 	var horn_root = Node3D.new()
 	horn_root.name = "AntlerRoot"
@@ -1098,8 +1152,8 @@ func _build_sculpted_antler_horn(root: Node3D) -> void:
 
 # --- M. PLACA / ESPINHO DORSAL ESTEGOSSAURO ---
 func _build_sculpted_dorsal_spike(root: Node3D) -> void:
-	var mat_plate = _make_organic_material(Color(0.55, 0.32, 0.22), 0.45, 0.08)
-	var mat_rim = _make_keratin_material(Color(0.18, 0.14, 0.10), Color(0.85, 0.75, 0.60))
+	var mat_plate = _make_organic_material(primary_color, 0.45, 0.08)
+	var mat_rim = _make_keratin_material(secondary_color, detail_color)
 
 	var spike_root = Node3D.new()
 	spike_root.name = "DorsalSpikeRoot"
@@ -1127,8 +1181,8 @@ func _build_sculpted_dorsal_spike(root: Node3D) -> void:
 
 # --- N. LÂMINA ÓSSEA DE FOICE (Mantis / Cotovelo) ---
 func _build_sculpted_bone_blade(root: Node3D) -> void:
-	var mat_base = _make_organic_material(Color(0.35, 0.22, 0.18), 0.45, 0.10)
-	var mat_blade = _make_keratin_material(Color(0.95, 0.95, 0.90), Color(0.98, 0.98, 0.95))
+	var mat_base = _make_organic_material(primary_color.darkened(0.2), 0.45, 0.10)
+	var mat_blade = _make_keratin_material(secondary_color.darkened(0.2), detail_color)
 
 	var blade_root = Node3D.new()
 	blade_root.name = "BoneBladeRoot"
@@ -1152,6 +1206,416 @@ func _build_sculpted_bone_blade(root: Node3D) -> void:
 	]
 	var scythe_rads: Array[float] = [0.06, 0.045, 0.028, 0.002]
 	blade_root.add_child(_create_lofted_tube(scythe_pts, scythe_rads, 8, mat_blade))
+
+# --- O. TENTÁCULO CEFALÓPODE / ABISSAL COM VENTOSAS ---
+func _build_sculpted_tentacle(root: Node3D) -> void:
+	var mat_skin = _make_organic_material(primary_color, 0.40, 0.05, primary_color.lightened(0.2), 0.3)
+	var mat_sucker = _make_organic_material(secondary_color, 0.25, 0.1, secondary_color.lightened(0.2), 0.2)
+	var mat_rim = _make_keratin_material(secondary_color, detail_color)
+
+	var tent_root = Node3D.new()
+	tent_root.name = "TentacleRoot"
+	root.add_child(tent_root)
+
+	# Tronco do tentáculo em curva sinuosa fluida
+	var tent_pts: Array[Vector3] = [
+		Vector3(0.0, 0.0, 0.0),
+		Vector3(0.0, 0.18, 0.06),
+		Vector3(0.0, 0.36, 0.03),
+		Vector3(0.0, 0.54, -0.06),
+		Vector3(0.0, 0.70, -0.08),
+		Vector3(0.0, 0.84, 0.04),
+		Vector3(0.0, 0.92, 0.14)
+	]
+	var tent_rads: Array[float] = [0.13, 0.115, 0.095, 0.075, 0.055, 0.032, 0.006]
+	tent_root.add_child(_create_lofted_tube(tent_pts, tent_rads, 14, mat_skin))
+
+	# Fileiras de ventosas na face ventral/interna (+Z)
+	var sucker_stations = [
+		{"pos": Vector3(0.0, 0.16, 0.14), "r": 0.036},
+		{"pos": Vector3(0.0, 0.32, 0.11), "r": 0.032},
+		{"pos": Vector3(0.0, 0.48, 0.01), "r": 0.026},
+		{"pos": Vector3(0.0, 0.64, -0.02), "r": 0.020},
+		{"pos": Vector3(0.0, 0.78, 0.06), "r": 0.015}
+	]
+	for st in sucker_stations:
+		var p: Vector3 = st["pos"]
+		var r: float = st["r"]
+		for side in [-1.0, 1.0]:
+			var s_cup = MeshInstance3D.new()
+			var torus = TorusMesh.new()
+			torus.inner_radius = r * 0.45
+			torus.outer_radius = r
+			torus.rings = 10
+			torus.ring_segments = 8
+			s_cup.mesh = torus
+			s_cup.position = p + Vector3(side * r * 1.1, 0.0, 0.0)
+			s_cup.rotation = Vector3(PI * 0.5, 0.0, 0.0)
+			s_cup.material_override = mat_rim
+			tent_root.add_child(s_cup)
+
+			# Centro da ventosa
+			var s_in = MeshInstance3D.new()
+			var cyl = CylinderMesh.new()
+			cyl.top_radius = r * 0.42
+			cyl.bottom_radius = r * 0.42
+			cyl.height = 0.01
+			s_in.mesh = cyl
+			s_in.position = p + Vector3(side * r * 1.1, 0.0, -0.005)
+			s_in.rotation = Vector3(PI * 0.5, 0.0, 0.0)
+			s_in.material_override = mat_sucker
+			tent_root.add_child(s_in)
+
+# --- P. PINÇA CRUSTÁCEA MACIÇA ARTICULADA ---
+func _build_sculpted_claw_pincer(root: Node3D) -> void:
+	var mat_shell = _make_organic_material(secondary_color, 0.35, 0.15)
+	var mat_joint = _make_organic_material(primary_color, 0.50, 0.05)
+	var mat_teeth = _make_keratin_material(secondary_color.darkened(0.3), detail_color)
+
+	var pincer_root = Node3D.new()
+	pincer_root.name = "ClawPincerRoot"
+	root.add_child(pincer_root)
+
+	# 1. Braço / Mero e Carpo articulado
+	var arm_pts: Array[Vector3] = [
+		Vector3(0.0, 0.0, 0.0),
+		Vector3(0.0, -0.10, 0.10),
+		Vector3(0.0, -0.22, 0.18),
+		Vector3(0.0, -0.32, 0.22)
+	]
+	var arm_rads: Array[float] = [0.08, 0.09, 0.08, 0.07]
+	pincer_root.add_child(_create_lofted_tube(arm_pts, arm_rads, 10, mat_joint))
+
+	# 2. Bulbo robusto da pinça (Propodus)
+	var palm_pts: Array[Vector3] = [
+		Vector3(0.0, -0.30, 0.22),
+		Vector3(0.0, -0.42, 0.30),
+		Vector3(0.0, -0.54, 0.36)
+	]
+	var palm_rads: Array[float] = [0.075, 0.13, 0.11]
+	pincer_root.add_child(_create_lofted_tube(palm_pts, palm_rads, 12, mat_shell))
+
+	# 3. Dedo Fixo da Pinça (curvado para dentro)
+	var fixed_pts: Array[Vector3] = [
+		Vector3(0.0, -0.52, 0.34),
+		Vector3(0.0, -0.66, 0.38),
+		Vector3(0.0, -0.78, 0.34)
+	]
+	var fixed_rads: Array[float] = [0.075, 0.045, 0.005]
+	pincer_root.add_child(_create_lofted_tube(fixed_pts, fixed_rads, 10, mat_shell))
+
+	# 4. Dedo Móvel Oposto (Dactylus) em garra curva afiada
+	var movable_pts: Array[Vector3] = [
+		Vector3(0.0, -0.50, 0.38),
+		Vector3(0.0, -0.64, 0.48),
+		Vector3(0.0, -0.78, 0.40)
+	]
+	var mov_rads: Array[float] = [0.065, 0.040, 0.004]
+	pincer_root.add_child(_create_lofted_tube(movable_pts, mov_rads, 10, mat_shell))
+
+	# Dentes de esmagamento no vão da pinça
+	for i in range(4):
+		var t_f = float(i) / 3.0
+		var pos_fixed = fixed_pts[1].lerp(fixed_pts[2], t_f) + Vector3(0.0, 0.0, 0.03)
+		var tooth_pts: Array[Vector3] = [pos_fixed, pos_fixed + Vector3(0.0, 0.015, 0.02)]
+		var tooth_rads: Array[float] = [0.018, 0.004]
+		pincer_root.add_child(_create_lofted_tube(tooth_pts, tooth_rads, 6, mat_teeth))
+
+# --- Q. CAUDA DE ESCORPIÃO COM METASOMA SEGMENTADO E AGUILHÃO DUPLO ---
+func _build_sculpted_scorpion_tail(root: Node3D) -> void:
+	var mat_chitin = _make_organic_material(secondary_color, 0.30, 0.16)
+	var mat_joint = _make_organic_material(primary_color.darkened(0.15), 0.45, 0.08)
+	var mat_stinger = _make_keratin_material(secondary_color.darkened(0.5), detail_color)
+
+	var scorp_root = Node3D.new()
+	scorp_root.name = "ScorpionTailRoot"
+	root.add_child(scorp_root)
+
+	# 5 segmentos articulados ascendentes arqueando para frente
+	var metasoma_segs = [
+		{"pts": [Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.12, -0.04)], "r0": 0.12, "r1": 0.10},
+		{"pts": [Vector3(0.0, 0.10, -0.03), Vector3(0.0, 0.24, -0.08)], "r0": 0.10, "r1": 0.088},
+		{"pts": [Vector3(0.0, 0.22, -0.07), Vector3(0.0, 0.38, -0.09)], "r0": 0.088, "r1": 0.076},
+		{"pts": [Vector3(0.0, 0.36, -0.08), Vector3(0.0, 0.52, -0.03)], "r0": 0.076, "r1": 0.072},
+		{"pts": [Vector3(0.0, 0.50, -0.02), Vector3(0.0, 0.64, 0.08)], "r0": 0.072, "r1": 0.080}
+	]
+	for seg in metasoma_segs:
+		var pts: Array[Vector3] = seg["pts"]
+		var rads: Array[float] = [seg["r0"], seg["r1"]]
+		scorp_root.add_child(_create_lofted_tube(pts, rads, 12, mat_chitin))
+		# Anel articular entre segmentos
+		var j_ring = MeshInstance3D.new()
+		var torus = TorusMesh.new()
+		torus.inner_radius = seg["r1"] * 0.8
+		torus.outer_radius = seg["r1"] * 1.05
+		j_ring.mesh = torus
+		j_ring.position = pts[1]
+		j_ring.material_override = mat_joint
+		scorp_root.add_child(j_ring)
+
+	# Telson (bulbo do veneno)
+	var telson = MeshInstance3D.new()
+	var t_sph = SphereMesh.new()
+	t_sph.radius = 0.085
+	t_sph.height = 0.17
+	telson.mesh = t_sph
+	telson.position = Vector3(0.0, 0.68, 0.12)
+	telson.material_override = mat_chitin
+	scorp_root.add_child(telson)
+
+	# Aguilhão primário hiper-curvo afiado
+	var sting_pts: Array[Vector3] = [
+		Vector3(0.0, 0.72, 0.16),
+		Vector3(0.0, 0.82, 0.26),
+		Vector3(0.0, 0.80, 0.40)
+	]
+	var sting_rads: Array[float] = [0.045, 0.022, 0.002]
+	scorp_root.add_child(_create_lofted_tube(sting_pts, sting_rads, 10, mat_stinger))
+
+	# Espinho subaculear de veneno
+	var sub_pts: Array[Vector3] = [
+		Vector3(0.0, 0.74, 0.20),
+		Vector3(0.0, 0.76, 0.26)
+	]
+	var sub_rads: Array[float] = [0.016, 0.002]
+	scorp_root.add_child(_create_lofted_tube(sub_pts, sub_rads, 6, mat_stinger))
+
+# --- R. BARBATANA AQUÁTICA COM RAIOS CARTILAGINOSOS ---
+func _build_sculpted_aquatic_fin(root: Node3D) -> void:
+	var mat_base = _make_organic_material(primary_color, 0.45, 0.08)
+	var mat_ray = _make_organic_material(secondary_color, 0.35, 0.15)
+	var mat_web = StandardMaterial3D.new()
+	mat_web.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat_web.albedo_color = Color(secondary_color.r, secondary_color.g, secondary_color.b, 0.85)
+	mat_web.roughness = 0.28
+	mat_web.rim_enabled = true
+	mat_web.rim = 0.5
+	mat_web.backlight_enabled = true
+	mat_web.backlight = primary_color.lightened(0.2)
+
+	var fin_root = Node3D.new()
+	fin_root.name = "AquaticFinRoot"
+	root.add_child(fin_root)
+
+	# Base muscular de implantação
+	var base_pts: Array[Vector3] = [
+		Vector3(0.0, 0.0, 0.0),
+		Vector3(0.0, 0.10, 0.02),
+		Vector3(0.0, 0.18, 0.03)
+	]
+	var base_rads: Array[float] = [0.10, 0.08, 0.06]
+	fin_root.add_child(_create_lofted_tube(base_pts, base_rads, 10, mat_base))
+
+	# Raio líder principal (bordo de ataque de tubarão)
+	var lead_pts: Array[Vector3] = [
+		Vector3(0.0, 0.16, 0.03),
+		Vector3(0.0, 0.34, 0.10),
+		Vector3(0.0, 0.54, 0.22),
+		Vector3(0.0, 0.68, 0.30)
+	]
+	var lead_rads: Array[float] = [0.055, 0.038, 0.022, 0.003]
+	fin_root.add_child(_create_lofted_tube(lead_pts, lead_rads, 8, mat_ray))
+
+	# Raios secundários estendendo para trás
+	var fin_tips = [
+		lead_pts.back(),
+		Vector3(0.0, 0.52, 0.10),
+		Vector3(0.0, 0.34, -0.06),
+		Vector3(0.0, 0.16, -0.14)
+	]
+	for i in range(1, fin_tips.size()):
+		var r_pts: Array[Vector3] = [
+			Vector3(0.0, 0.10 + i * 0.02, 0.0),
+			fin_tips[i] * 0.7,
+			fin_tips[i]
+		]
+		var r_rads: Array[float] = [0.035, 0.020, 0.003]
+		fin_root.add_child(_create_lofted_tube(r_pts, r_rads, 6, mat_ray))
+
+	# Malha da membrana aquática entre os raios
+	var st = SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var origin = Vector3(0.0, 0.12, 0.0)
+	for i in range(fin_tips.size() - 1):
+		st.add_vertex(origin)
+		st.add_vertex(fin_tips[i])
+		st.add_vertex(fin_tips[i + 1])
+	st.generate_normals()
+
+	var web_inst = MeshInstance3D.new()
+	web_inst.mesh = st.commit()
+	web_inst.material_override = mat_web
+	fin_root.add_child(web_inst)
+
+# --- S. CHIFRE MACIÇO DE RINOCERONTE COM QUERATINA COMPACTADA ---
+func _build_sculpted_rhino_horn(root: Node3D) -> void:
+	var mat_boss = _make_organic_material(primary_color.darkened(0.12), 0.65, 0.05)
+	var mat_horn = _make_keratin_material(secondary_color.darkened(0.4), detail_color)
+
+	var horn_root = Node3D.new()
+	horn_root.name = "RhinoHornRoot"
+	root.add_child(horn_root)
+
+	# Placa basal dérmica espessada (boss)
+	var boss_pts: Array[Vector3] = [
+		Vector3(0.0, -0.02, 0.0),
+		Vector3(0.0, 0.06, 0.02),
+		Vector3(0.0, 0.12, 0.03)
+	]
+	var boss_rads: Array[float] = [0.16, 0.17, 0.14]
+	horn_root.add_child(_create_lofted_tube(boss_pts, boss_rads, 14, mat_boss))
+
+	# Chifre maciço principal curvado para trás
+	var horn_pts: Array[Vector3] = [
+		Vector3(0.0, 0.10, 0.03),
+		Vector3(0.0, 0.24, 0.08),
+		Vector3(0.0, 0.40, 0.16),
+		Vector3(0.0, 0.54, 0.28),
+		Vector3(0.0, 0.64, 0.38)
+	]
+	var horn_rads: Array[float] = [0.13, 0.105, 0.075, 0.040, 0.004]
+	horn_root.add_child(_create_lofted_tube(horn_pts, horn_rads, 14, mat_horn))
+
+	# Chifre acessório frontal menor
+	var sub_pts: Array[Vector3] = [
+		Vector3(0.0, 0.06, -0.12),
+		Vector3(0.0, 0.18, -0.18),
+		Vector3(0.0, 0.28, -0.22)
+	]
+	var sub_rads: Array[float] = [0.075, 0.042, 0.003]
+	horn_root.add_child(_create_lofted_tube(sub_pts, sub_rads, 10, mat_horn))
+
+# --- T. ASA SERAFIM MAJESTOSA MULTICAMADAS ---
+func _build_sculpted_seraph_wing(root: Node3D) -> void:
+	var mat_arm = _make_organic_material(primary_color, 0.45, 0.05)
+	var mat_coverts = StandardMaterial3D.new()
+	mat_coverts.albedo_color = secondary_color.lightened(0.15)
+	mat_coverts.roughness = 0.35
+	var mat_primaries = StandardMaterial3D.new()
+	mat_primaries.albedo_color = secondary_color
+	mat_primaries.roughness = 0.38
+	var mat_tip = _make_keratin_material(secondary_color, detail_color)
+
+	var wing_pivot = Node3D.new()
+	wing_pivot.name = "SeraphWingPivot"
+	root.add_child(wing_pivot)
+
+	# Braço alar nobre em arco duplo
+	var arm_pts: Array[Vector3] = [
+		Vector3.ZERO,
+		Vector3(0.0, 0.30, 0.24),
+		Vector3(0.0, 0.72, 0.28),
+		Vector3(0.0, 1.15, 0.10),
+		Vector3(0.0, 1.48, -0.22)
+	]
+	var arm_rads: Array[float] = [0.10, 0.085, 0.065, 0.040, 0.012]
+	wing_pivot.add_child(_create_lofted_tube(arm_pts, arm_rads, 12, mat_arm))
+
+	# Camada 1: Penas Tectrizes Superiores (curtas e densas)
+	for i in range(4):
+		var base_p = arm_pts[1].lerp(arm_pts[3], float(i) / 3.0)
+		var f_tip = base_p + Vector3(0.0, -0.25, -0.35)
+		var c_pts: Array[Vector3] = [base_p, (base_p + f_tip) * 0.5, f_tip]
+		var c_rads: Array[float] = [0.035, 0.070, 0.005]
+		wing_pivot.add_child(_create_lofted_tube(c_pts, c_rads, 8, mat_coverts))
+
+	# Camada 2: Rêmiges Secundárias e Primárias Longas
+	var prim_tips = [
+		Vector3(0.0, 1.62, -0.38),
+		Vector3(0.0, 1.44, -0.72),
+		Vector3(0.0, 1.18, -0.98),
+		Vector3(0.0, 0.88, -1.04),
+		Vector3(0.0, 0.54, -0.92),
+		Vector3(0.0, 0.22, -0.70)
+	]
+	for i in range(prim_tips.size()):
+		var base_p = arm_pts[2].lerp(arm_pts[4], float(i) / float(prim_tips.size() - 1))
+		var tip_p = prim_tips[i]
+		var p_pts: Array[Vector3] = [base_p, base_p.lerp(tip_p, 0.6) + Vector3(0.0, 0.04, 0.0), tip_p]
+		var p_rads: Array[float] = [0.032, 0.088, 0.006]
+		wing_pivot.add_child(_create_lofted_tube(p_pts, p_rads, 8, mat_primaries if i > 1 else mat_tip))
+
+# --- U. OLHO CICLÓPEO COLOSSAL COM CRISTA SUPERCILIAR ---
+func _build_sculpted_cyclops_eye(root: Node3D) -> void:
+	var mat_brow = _make_organic_material(primary_color, 0.55, 0.05)
+	var mat_rim = _make_keratin_material(secondary_color, detail_color)
+
+	var mat_sclera = StandardMaterial3D.new()
+	mat_sclera.albedo_color = Color(0.96, 0.94, 0.88)
+	mat_sclera.roughness = 0.05
+	mat_sclera.clearcoat_enabled = true
+	mat_sclera.clearcoat = 1.0
+
+	var mat_iris = StandardMaterial3D.new()
+	mat_iris.albedo_color = secondary_color
+	mat_iris.roughness = 0.1
+	mat_iris.emission_enabled = true
+	mat_iris.emission = secondary_color.lightened(0.3)
+	mat_iris.emission_energy_multiplier = 0.8
+
+	var mat_pupil = StandardMaterial3D.new()
+	mat_pupil.albedo_color = Color(0.02, 0.02, 0.03)
+
+	var eye_root = Node3D.new()
+	eye_root.name = "CyclopsEyeRoot"
+	root.add_child(eye_root)
+
+	# 1. Crista superciliar pesada e pálpebra colossal
+	var brow_pts: Array[Vector3] = [
+		Vector3(-0.24, 0.16, 0.08),
+		Vector3(0.0, 0.24, 0.12),
+		Vector3(0.24, 0.16, 0.08)
+	]
+	var brow_rads: Array[float] = [0.06, 0.09, 0.06]
+	eye_root.add_child(_create_lofted_tube(brow_pts, brow_rads, 10, mat_brow))
+
+	# Pálpebra inferior
+	var lower_brow: Array[Vector3] = [
+		Vector3(-0.20, 0.04, -0.08),
+		Vector3(0.0, 0.02, -0.12),
+		Vector3(0.20, 0.04, -0.08)
+	]
+	var lower_rads: Array[float] = [0.05, 0.07, 0.05]
+	eye_root.add_child(_create_lofted_tube(lower_brow, lower_rads, 10, mat_brow))
+
+	# 2. Globo Ocular Colossal
+	var eyeball = MeshInstance3D.new()
+	var sphere = SphereMesh.new()
+	sphere.radius = 0.18
+	sphere.height = 0.36
+	eyeball.mesh = sphere
+	eyeball.position = Vector3(0.0, 0.12, 0.0)
+	eyeball.material_override = mat_sclera
+	eye_root.add_child(eyeball)
+
+	# 3. Íris Ciclópea Brilhante
+	var iris = MeshInstance3D.new()
+	var cyl = CylinderMesh.new()
+	cyl.top_radius = 0.095
+	cyl.bottom_radius = 0.105
+	cyl.height = 0.03
+	iris.mesh = cyl
+	iris.position = Vector3(0.0, 0.28, 0.0)
+	iris.material_override = mat_iris
+	eye_root.add_child(iris)
+
+	# 4. Pupila
+	var pupil = MeshInstance3D.new()
+	var p_mesh = BoxMesh.new()
+	p_mesh.size = Vector3(0.038, 0.025, 0.13)
+	pupil.mesh = p_mesh
+	pupil.position = Vector3(0.0, 0.29, 0.0)
+	pupil.material_override = mat_pupil
+	eye_root.add_child(pupil)
+
+	# 5. Pequenos espinhos córneo-orbitais de proteção
+	for side in [-1.0, 1.0]:
+		var horn_pts: Array[Vector3] = [
+			Vector3(side * 0.22, 0.14, 0.06),
+			Vector3(side * 0.34, 0.22, 0.10)
+		]
+		var horn_rads: Array[float] = [0.035, 0.003]
+		eye_root.add_child(_create_lofted_tube(horn_pts, horn_rads, 6, mat_rim))
 
 # ==============================================================================
 # UTILITÁRIOS DE GERAÇÃO DE MALHA TUBULAR SUAVE (SURFACE TOOL) E MATERIAIS
