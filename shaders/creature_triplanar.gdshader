@@ -75,6 +75,16 @@ float procedural_skin_pattern(vec3 p) {
 	return clamp(n * 0.5 + 0.5, 0.0, 1.0);
 }
 
+// --- Funções de Relevo Procedural de Micro-Escamas Orgânicas ---
+float micro_scale_height(vec3 p) {
+	vec3 s = p * 16.0;
+	float b = sin(s.x) * cos(s.y) + sin(s.y * 1.3 + s.x * 0.4) * cos(s.z * 1.2) + sin(s.z * 1.4) * cos(s.x * 1.1);
+	// Camada fina secundária (poros)
+	vec3 s2 = p * 36.0;
+	float b2 = sin(s2.x + s2.z) * cos(s2.y);
+	return b * 0.25 + b2 * 0.08;
+}
+
 void fragment() {
 	vec3 abs_normal = abs(v_triplanar_normal);
 	vec3 weights = pow(abs_normal, vec3(triplanar_sharpness));
@@ -85,6 +95,7 @@ void fragment() {
 	// 1. Cálculo da cor com suporte a padrão procedural ou textura
 	float blend_factor = 0.0;
 	vec3 tint_result = base_color.rgb;
+	float skin_noise = 0.5;
 
 	if (use_albedo_texture) {
 		vec4 tex_albedo = sample_triplanar_texture(texture_albedo, uv_pos, weights);
@@ -95,31 +106,53 @@ void fragment() {
 		// 1) Máscara de ventre/dorso baseada na normal Y (barriga vs costas)
 		float belly_dorso = clamp((-v_triplanar_normal.y * 0.6 + 0.4), 0.0, 1.0);
 		// 2) Manchas de pele celulares via ruído procedural
-		float skin_noise = procedural_skin_pattern(uv_pos);
+		skin_noise = procedural_skin_pattern(uv_pos);
 		// 3) Mistura modulada pelo pattern_blend
 		blend_factor = clamp(mix(belly_dorso, skin_noise, 0.45) * pattern_blend * 1.5, 0.0, 1.0);
 		tint_result = mix(base_color.rgb, secondary_color.rgb, blend_factor);
 	}
 
-	ALBEDO = tint_result;
+	// 2. Efeito Fresnel / Velvet Rim Orgânico (brilho aveludado de borda)
+	float n_dot_v = clamp(dot(normalize(NORMAL), normalize(VIEW)), 0.0, 1.0);
+	float fresnel = pow(1.0 - n_dot_v, 3.2);
+	vec3 rim_sheen = mix(tint_result, sss_color.rgb, 0.6) * fresnel * (0.35 * (1.0 + sss_translucency));
+
+	ALBEDO = tint_result + rim_sheen;
 	ALPHA = 1.0;
 
-	// 2. Normal Map (só usa se textura estiver ativa para não corromper normais)
+	// 3. Normal Map: se tiver textura usa a textura; se não, calcula micro-escamas orgânicas em tempo real!
 	if (use_normal_texture) {
 		vec3 tri_norm = sample_triplanar_normal(texture_normal, uv_pos, weights, v_triplanar_normal);
 		NORMAL_MAP = tri_norm;
 		NORMAL_MAP_DEPTH = normal_scale;
+	} else {
+		// Micro-escamas procedurais que reagem à luz nos ângulos rasantes
+		float eps = 0.035;
+		float h_c = micro_scale_height(uv_pos);
+		float h_x = micro_scale_height(uv_pos + vec3(eps, 0.0, 0.0));
+		float h_y = micro_scale_height(uv_pos + vec3(0.0, eps, 0.0));
+		float h_z = micro_scale_height(uv_pos + vec3(0.0, 0.0, eps));
+		vec3 world_grad = vec3(h_x - h_c, h_y - h_c, h_z - h_c) / eps;
+		
+		// Converte gradiente para o espaço de visão
+		vec3 view_grad = mat3(VIEW_MATRIX) * world_grad;
+		NORMAL = normalize(NORMAL - view_grad * (0.09 * normal_scale));
 	}
 
-	// 3. Roughness e Metallic
-	ROUGHNESS = roughness;
+	// 4. Roughness orgânica com micro-variação celular
+	float micro_rough = micro_scale_height(uv_pos) * 0.12;
+	ROUGHNESS = clamp(roughness + micro_rough, 0.08, 0.95);
 	METALLIC = metallic;
 
-	// 4. Subsurface Scattering / Translucidez sem artefatos
+	// 5. Oclusão de Cavidades da Pele (Ambient Cavity Occlusion)
+	AO = clamp(0.72 + 0.28 * skin_noise, 0.5, 1.0);
+	AO_LIGHT_AFFECT = 0.55;
+
+	// 6. Subsurface Scattering / Translucidez sem artefatos
 	if (sss_strength > 0.0) {
 		SSS_STRENGTH = sss_strength;
 		SSS_TRANSMITTANCE_COLOR = sss_color;
 		SSS_TRANSMITTANCE_DEPTH = sss_translucency;
-		BACKLIGHT = sss_color.rgb * sss_translucency * 0.3;
+		BACKLIGHT = sss_color.rgb * sss_translucency * 0.35;
 	}
 }

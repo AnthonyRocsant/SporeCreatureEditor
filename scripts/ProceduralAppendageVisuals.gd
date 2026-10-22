@@ -514,8 +514,11 @@ func _build_sculpted_eye(root: Node3D) -> void:
 
 	var mat_sclera = StandardMaterial3D.new()
 	mat_sclera.albedo_color = Color(0.96, 0.95, 0.90)
-	mat_sclera.roughness = 0.08
-	mat_sclera.metallic = 0.05
+	mat_sclera.roughness = 0.04
+	mat_sclera.metallic = 0.02
+	mat_sclera.clearcoat_enabled = true
+	mat_sclera.clearcoat = 1.0
+	mat_sclera.clearcoat_roughness = 0.04
 
 	var mat_iris = StandardMaterial3D.new()
 	mat_iris.albedo_color = Color(0.95, 0.62, 0.12)
@@ -831,7 +834,10 @@ func _build_sculpted_stalk_eye(root: Node3D) -> void:
 	var mat_stalk = _make_organic_material(Color(0.55, 0.42, 0.30), 0.50, 0.05)
 	var mat_sclera = StandardMaterial3D.new()
 	mat_sclera.albedo_color = Color(0.95, 0.94, 0.90)
-	mat_sclera.roughness = 0.1
+	mat_sclera.roughness = 0.04
+	mat_sclera.clearcoat_enabled = true
+	mat_sclera.clearcoat = 1.0
+	mat_sclera.clearcoat_roughness = 0.04
 	var mat_pupil = StandardMaterial3D.new()
 	mat_pupil.albedo_color = Color(0.05, 0.05, 0.06)
 
@@ -1156,6 +1162,9 @@ func _make_organic_material(albedo: Color, rough: float, metal: float, sss_col: 
 	mat.albedo_color = albedo
 	mat.roughness = rough
 	mat.metallic = metal
+	mat.rim_enabled = true
+	mat.rim = 0.35
+	mat.rim_tint = 0.45
 	if sss_str > 0.01:
 		mat.backlight_enabled = true
 		mat.backlight = sss_col * sss_str
@@ -1164,8 +1173,11 @@ func _make_organic_material(albedo: Color, rough: float, metal: float, sss_col: 
 func _make_keratin_material(base_col: Color, tip_col: Color) -> StandardMaterial3D:
 	var mat = StandardMaterial3D.new()
 	mat.albedo_color = base_col.lerp(tip_col, 0.65)
-	mat.roughness = 0.22
-	mat.metallic = 0.18
+	mat.roughness = 0.24
+	mat.metallic = 0.12
+	mat.clearcoat_enabled = true
+	mat.clearcoat = 0.65
+	mat.clearcoat_roughness = 0.20
 	return mat
 
 ## Gera um tubo orgânico suave (lofting) passando pelos pontos e raios informados

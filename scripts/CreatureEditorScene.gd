@@ -8,6 +8,7 @@ extends Node3D
 @onready var spine_controller: SpineManager = $CreatureRoot/SpineController
 @onready var ui: CreatureEditorUI = $CanvasLayer/CreatureEditorUI
 @onready var sandbox_env: Node3D = $SandboxEnvironment
+@onready var editor_pedestal: Node3D = get_node_or_null("EditorStudioPedestal")
 
 var creature_data: CreatureData
 var skill_factory: SkillFactory
@@ -93,10 +94,14 @@ func _ready() -> void:
 
 func _on_mode_changed(new_mode: EditorState.Mode, _old_mode: EditorState.Mode) -> void:
 	if new_mode == EditorState.Mode.MODO_SANDBOX:
+		if editor_pedestal:
+			editor_pedestal.visible = false
 		sandbox_env.visible = true
 		procedural_gait.register_limbs()
 		procedural_gait.is_moving = true
 	else:
+		if editor_pedestal:
+			editor_pedestal.visible = true
 		sandbox_env.visible = false
 		procedural_gait.is_moving = false
 		procedural_gait.reset_limbs_pose()
@@ -117,15 +122,15 @@ func _decorate_sandbox_environment() -> void:
 		floor_mesh.material_override = floor_mat
 
 	var mat_stone = StandardMaterial3D.new()
-	mat_stone.albedo_color = Color(0.38, 0.36, 0.34)
-	mat_stone.roughness = 0.75
+	mat_stone.albedo_color = Color(0.35, 0.38, 0.36)
+	mat_stone.roughness = 0.88
 
 	var mat_crystal = StandardMaterial3D.new()
-	mat_crystal.albedo_color = Color(0.25, 0.75, 0.95)
-	mat_crystal.roughness = 0.15
+	mat_crystal.albedo_color = Color(0.20, 0.82, 1.0)
+	mat_crystal.roughness = 0.12
 	mat_crystal.emission_enabled = true
-	mat_crystal.emission = Color(0.15, 0.55, 0.85)
-	mat_crystal.emission_energy_multiplier = 0.6
+	mat_crystal.emission = Color(0.25, 0.85, 1.0)
+	mat_crystal.emission_energy_multiplier = 1.5
 
 	# Anéis concêntricos de marcação no solo e rochas/cristais de referência para caminhada e voo
 	var prop_coords = [
