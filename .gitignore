@@ -1,0 +1,5 @@
+# Godot 4 standard gitignore
+.godot/
+*.translation
+export_presets.cfg
+scratch/

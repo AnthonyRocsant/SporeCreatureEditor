@@ -1,0 +1,845 @@
+[gd_scene load_steps=3 format=3 uid="uid://bvyekp2m83q7w"]
+
+[ext_resource type="Script" path="res://scripts/CreatureEditorUI.gd" id="1_editor_ui"]
+[ext_resource type="Script" path="res://scripts/SkillSlotButton.gd" id="2_slot_btn"]
+
+[node name="CreatureEditorUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_editor_ui")
+
+[node name="HUDTop" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 70.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 8
+
+[node name="HBox" type="HBoxContainer" parent="HUDTop"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="BiomassContainer" type="VBoxContainer" parent="HUDTop/HBox"]
+custom_minimum_size = Vector2(230, 0)
+layout_mode = 2
+
+[node name="BiomassLabel" type="Label" parent="HUDTop/HBox/BiomassContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Biomassa: 100 / 100"
+
+[node name="BiomassBar" type="ProgressBar" parent="HUDTop/HBox/BiomassContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="ModeTabs" type="HBoxContainer" parent="HUDTop/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BtnSculpt" type="Button" parent="HUDTop/HBox/ModeTabs"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "🦴 Escultura"
+
+[node name="BtnAppendages" type="Button" parent="HUDTop/HBox/ModeTabs"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "🦿 Apêndices"
+
+[node name="BtnPaint" type="Button" parent="HUDTop/HBox/ModeTabs"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "🎨 Pintura"
+
+[node name="BtnSkills" type="Button" parent="HUDTop/HBox/ModeTabs"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "⚡ Habilidades"
+
+[node name="SaveLoadBox" type="HBoxContainer" parent="HUDTop/HBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="BtnSaveJson" type="Button" parent="HUDTop/HBox/SaveLoadBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "💾 Salvar"
+
+[node name="BtnLoadJson" type="Button" parent="HUDTop/HBox/SaveLoadBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "📂 Carregar"
+
+[node name="BtnTestDrive" type="Button" parent="HUDTop/HBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(175, 40)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 14
+text = "▶ Test Drive (Sandbox)"
+
+[node name="LocomotionWarningBanner" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -280.0
+offset_top = 74.0
+offset_right = 280.0
+offset_bottom = 110.0
+grow_horizontal = 2
+
+[node name="LblLocomotionWarning" type="Label" parent="LocomotionWarningBanner"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.78, 0.2, 1)
+theme_override_font_sizes/font_size = 13
+text = "⚠️ Locomoção Terrestre Inválida: Reposicione as patas no plano do solo"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SculptPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 90.0
+offset_right = 295.0
+offset_bottom = -20.0
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="SculptPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="VBox" type="VBoxContainer" parent="SculptPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 11
+
+[node name="Title" type="Label" parent="SculptPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Modelagem da Coluna"
+
+[node name="HSeparator" type="HSeparator" parent="SculptPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Instructions" type="Label" parent="SculptPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "• Clique: Selecionar vértebra
+• Puxar pontas (verde): Adicionar vértebras
+• Scroll: Raio (0.15m - 2.50m)
+• Shift+Scroll: Tamanho vértebra
+• Delete: Remover vértebra"
+
+[node name="HSeparator2" type="HSeparator" parent="SculptPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblVertebraInfo" type="Label" parent="SculptPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Vértebras Ativas: 5 (3 a 16)"
+
+[node name="HBoxRadius" type="HBoxContainer" parent="SculptPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblRadius" type="Label" parent="SculptPanel/Margin/VBox/HBoxRadius"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Raio (Grossura):"
+
+[node name="LblVertebraRadiusVal" type="Label" parent="SculptPanel/Margin/VBox/HBoxRadius"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0.50m"
+
+[node name="SliderVertebraRadius" type="HSlider" parent="SculptPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 0.15
+max_value = 2.5
+step = 0.05
+value = 0.5
+
+[node name="HBoxVertebraSize" type="HBoxContainer" parent="SculptPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblVertebraSize" type="Label" parent="SculptPanel/Margin/VBox/HBoxVertebraSize"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Tamanho Vértebra:"
+
+[node name="LblVertebraSizeVal" type="Label" parent="SculptPanel/Margin/VBox/HBoxVertebraSize"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "1.00x"
+
+[node name="SliderVertebraSize" type="HSlider" parent="SculptPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 0.5
+max_value = 2.0
+step = 0.05
+value = 1.0
+
+[node name="BtnResetSpine" type="Button" parent="SculptPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "↺ Redefinir Coluna"
+
+[node name="AppendagesPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 90.0
+offset_right = 365.0
+offset_bottom = -20.0
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="AppendagesPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="AppendagesPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="AppendagesPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "🦿 Catálogo de Apêndices"
+
+[node name="BtnToggleSymmetry" type="Button" parent="AppendagesPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+focus_mode = 0
+text = "Simetria Bilateral: LIGADA"
+
+[node name="HBoxPartRot" type="HBoxContainer" parent="AppendagesPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblPartRot" type="Label" parent="AppendagesPanel/Margin/VBox/HBoxPartRot"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+text = "Rotação (Scroll / Q,E):"
+
+[node name="LblPartRotationVal" type="Label" parent="AppendagesPanel/Margin/VBox/HBoxPartRot"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "0°"
+
+[node name="SliderPartRotation" type="HSlider" parent="AppendagesPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 360.0
+step = 5.0
+
+[node name="HBoxPartScale" type="HBoxContainer" parent="AppendagesPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblPartScale" type="Label" parent="AppendagesPanel/Margin/VBox/HBoxPartScale"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+text = "Escala (Shift+Scroll / Z,X):"
+
+[node name="LblPartScaleVal" type="Label" parent="AppendagesPanel/Margin/VBox/HBoxPartScale"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "1.00x"
+
+[node name="SliderPartScale" type="HSlider" parent="AppendagesPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 0.5
+max_value = 2.0
+step = 0.05
+value = 1.0
+
+[node name="HSeparatorCategory" type="HSeparator" parent="AppendagesPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblCategories" type="Label" parent="AppendagesPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Categorias:"
+
+[node name="CategoryGrid" type="GridContainer" parent="AppendagesPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 3
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+
+[node name="BtnCatAll" type="Button" parent="AppendagesPanel/Margin/VBox/CategoryGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 11
+text = "⭐ Todas"
+
+[node name="BtnCatMouth" type="Button" parent="AppendagesPanel/Margin/VBox/CategoryGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 11
+text = "👄 Bocas"
+
+[node name="BtnCatLeg" type="Button" parent="AppendagesPanel/Margin/VBox/CategoryGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 11
+text = "🦵 Patas"
+
+[node name="BtnCatEye" type="Button" parent="AppendagesPanel/Margin/VBox/CategoryGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 11
+text = "👁️ Olhos"
+
+[node name="BtnCatTail" type="Button" parent="AppendagesPanel/Margin/VBox/CategoryGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 11
+text = "🦎 Rabos"
+
+[node name="BtnCatWing" type="Button" parent="AppendagesPanel/Margin/VBox/CategoryGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 11
+text = "🪽 Asas"
+
+[node name="BtnCatDefense" type="Button" parent="AppendagesPanel/Margin/VBox/CategoryGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 11
+text = "⚔️ Defesa"
+
+[node name="AppendagesScroll" type="ScrollContainer" parent="AppendagesPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="AppendageItemList" type="VBoxContainer" parent="AppendagesPanel/Margin/VBox/AppendagesScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5
+
+[node name="LblPartInfo" type="Label" parent="AppendagesPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Clique num membro já fixado para selecioná-lo ou pressione Delete para remover."
+autowrap_mode = 2
+
+[node name="HBoxPartActions" type="HBoxContainer" parent="AppendagesPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="BtnDeleteSelectedPart" type="Button" parent="AppendagesPanel/Margin/VBox/HBoxPartActions"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "❌ Excluir (Del)"
+
+[node name="BtnClearParts" type="Button" parent="AppendagesPanel/Margin/VBox/HBoxPartActions"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "🗑️ Limpar Tudo"
+
+[node name="PaintPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 90.0
+offset_right = 290.0
+offset_bottom = -20.0
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="PaintPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="VBox" type="VBoxContainer" parent="PaintPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="PaintPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Editor de Pele & Pintura"
+
+[node name="HSeparator" type="HSeparator" parent="PaintPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblPrimary" type="Label" parent="PaintPanel/Margin/VBox"]
+layout_mode = 2
+text = "Cor Primária:"
+
+[node name="PrimaryColorPicker" type="ColorPickerButton" parent="PaintPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+color = Color(0.85, 0.45, 0.35, 1)
+
+[node name="LblSecondary" type="Label" parent="PaintPanel/Margin/VBox"]
+layout_mode = 2
+text = "Cor Secundária:"
+
+[node name="SecondaryColorPicker" type="ColorPickerButton" parent="PaintPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+color = Color(0.3, 0.15, 0.1, 1)
+
+[node name="HBoxScale" type="HBoxContainer" parent="PaintPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblScale" type="Label" parent="PaintPanel/Margin/VBox/HBoxScale"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Escala Textura:"
+
+[node name="LblTextureScaleVal" type="Label" parent="PaintPanel/Margin/VBox/HBoxScale"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "2.0x"
+
+[node name="SliderTextureScale" type="HSlider" parent="PaintPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 0.5
+max_value = 10.0
+step = 0.1
+value = 2.0
+
+[node name="HBoxSSS" type="HBoxContainer" parent="PaintPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblSSS" type="Label" parent="PaintPanel/Margin/VBox/HBoxSSS"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Brilho SSS:"
+
+[node name="LblSSSVal" type="Label" parent="PaintPanel/Margin/VBox/HBoxSSS"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0.30"
+
+[node name="SliderSSS" type="HSlider" parent="PaintPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 2.0
+step = 0.05
+value = 0.3
+
+[node name="SkillsPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 90.0
+offset_right = 330.0
+offset_bottom = -95.0
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="SkillsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="VBox" type="VBoxContainer" parent="SkillsPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="SkillsPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Leitura Anatômica & Skills"
+
+[node name="HSeparator" type="HSeparator" parent="SkillsPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblSkillsHelp" type="Label" parent="SkillsPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Os 5 golpes de maior impacto são mapeados automaticamente em Q, E, R, F, V. Arraste os botões da barra inferior (Drag & Drop) para reordenar os atalhos!"
+autowrap_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="SkillsPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblUnlockedSkillsList" type="Label" parent="SkillsPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 12
+text = "Nenhuma habilidade ativa. Adicione bocas, garras, chifres, asas ou caudas!"
+autowrap_mode = 2
+
+[node name="HotbarPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -335.0
+offset_top = -78.0
+offset_right = 335.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Margin" type="MarginContainer" parent="HotbarPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxSlots" type="HBoxContainer" parent="HotbarPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="SlotQ" type="Button" parent="HotbarPanel/Margin/HBoxSlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(122, 46)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "[Q] Vazio"
+script = ExtResource("2_slot_btn")
+slot_key = "Q"
+
+[node name="SlotE" type="Button" parent="HotbarPanel/Margin/HBoxSlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(122, 46)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "[E] Vazio"
+script = ExtResource("2_slot_btn")
+slot_key = "E"
+
+[node name="SlotR" type="Button" parent="HotbarPanel/Margin/HBoxSlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(122, 46)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "[R] Vazio"
+script = ExtResource("2_slot_btn")
+slot_key = "R"
+
+[node name="SlotF" type="Button" parent="HotbarPanel/Margin/HBoxSlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(122, 46)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "[F] Vazio"
+script = ExtResource("2_slot_btn")
+slot_key = "F"
+
+[node name="SlotV" type="Button" parent="HotbarPanel/Margin/HBoxSlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(122, 46)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "[V] Vazio"
+script = ExtResource("2_slot_btn")
+slot_key = "V"
+
+[node name="StatsPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -265.0
+offset_top = 90.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="StatsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="VBox" type="VBoxContainer" parent="StatsPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="StatsPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Atributos & Física"
+
+[node name="HSeparator" type="HSeparator" parent="StatsPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="HBoxHealth" type="HBoxContainer" parent="StatsPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblHealth" type="Label" parent="StatsPanel/Margin/VBox/HBoxHealth"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "HP (Vida):"
+
+[node name="LblHealthVal" type="Label" parent="StatsPanel/Margin/VBox/HBoxHealth"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "100"
+
+[node name="BarHealth" type="ProgressBar" parent="StatsPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+max_value = 350.0
+value = 100.0
+show_percentage = false
+
+[node name="HBoxStrength" type="HBoxContainer" parent="StatsPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblStrength" type="Label" parent="StatsPanel/Margin/VBox/HBoxStrength"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "STR (Força):"
+
+[node name="LblStrengthVal" type="Label" parent="StatsPanel/Margin/VBox/HBoxStrength"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "10"
+
+[node name="BarStrength" type="ProgressBar" parent="StatsPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+max_value = 100.0
+value = 10.0
+show_percentage = false
+
+[node name="HBoxAgility" type="HBoxContainer" parent="StatsPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblAgility" type="Label" parent="StatsPanel/Margin/VBox/HBoxAgility"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "AGL (Agilidade):"
+
+[node name="LblAgilityVal" type="Label" parent="StatsPanel/Margin/VBox/HBoxAgility"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0.0"
+
+[node name="BarAgility" type="ProgressBar" parent="StatsPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+max_value = 100.0
+value = 0.0
+show_percentage = false
+
+[node name="HBoxSpeed" type="HBoxContainer" parent="StatsPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblSpeed" type="Label" parent="StatsPanel/Margin/VBox/HBoxSpeed"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SPD (Velocidade):"
+
+[node name="LblSpeedVal" type="Label" parent="StatsPanel/Margin/VBox/HBoxSpeed"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0.0"
+
+[node name="BarSpeed" type="ProgressBar" parent="StatsPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+max_value = 25.0
+value = 0.0
+show_percentage = false
+
+[node name="HSeparator2" type="HSeparator" parent="StatsPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblStabilityInfo" type="Label" parent="StatsPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Massa: 8.0 kg
+Knockback CoM: 1.00x
+Apoios no Solo: 0 / 2"
+
+[node name="SlotMenuModal" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Backdrop" type="ColorRect" parent="SlotMenuModal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.72)
+
+[node name="CenterContainer" type="CenterContainer" parent="SlotMenuModal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="SlotMenuModal/CenterContainer"]
+custom_minimum_size = Vector2(860, 620)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="SlotMenuModal/CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 18
+
+[node name="VBox" type="VBoxContainer" parent="SlotMenuModal/CenterContainer/PanelContainer/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderHBox" type="HBoxContainer" parent="SlotMenuModal/CenterContainer/PanelContainer/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblSlotModalTitle" type="Label" parent="SlotMenuModal/CenterContainer/PanelContainer/Margin/VBox/HeaderHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "💾 Salvar / Carregar Criatura (15 Slots)"
+
+[node name="BtnCloseSlotMenu" type="Button" parent="SlotMenuModal/CenterContainer/PanelContainer/Margin/VBox/HeaderHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 32)
+layout_mode = 2
+focus_mode = 0
+text = "✖ Fechar"
+
+[node name="NameHBox" type="HBoxContainer" parent="SlotMenuModal/CenterContainer/PanelContainer/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LblName" type="Label" parent="SlotMenuModal/CenterContainer/PanelContainer/Margin/VBox/NameHBox"]
+layout_mode = 2
+text = "Nome da Criatura ao Salvar:"
+
+[node name="TxtCreatureName" type="LineEdit" parent="SlotMenuModal/CenterContainer/PanelContainer/Margin/VBox/NameHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Digite o nome da criatura..."
+text = "Minha Criatura"
+
+[node name="HSeparator" type="HSeparator" parent="SlotMenuModal/CenterContainer/PanelContainer/Margin/VBox"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="SlotMenuModal/CenterContainer/PanelContainer/Margin/VBox"]
+custom_minimum_size = Vector2(0, 420)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="SlotListContainer" type="VBoxContainer" parent="SlotMenuModal/CenterContainer/PanelContainer/Margin/VBox/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="LblSlotModalStatus" type="Label" parent="SlotMenuModal/CenterContainer/PanelContainer/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
+theme_override_font_sizes/font_size = 13
+text = "Escolha um dos 15 slots para salvar ou carregar sua criatura."
+

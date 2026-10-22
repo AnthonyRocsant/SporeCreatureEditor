@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://b8t1xeqy1m4p1"]
+
+[ext_resource type="Script" path="res://scripts/ProceduralAppendageVisuals.gd" id="1_visuals"]
+
+[node name="EyeSimple" type="Node3D"]
+script = ExtResource("1_visuals")
+appendage_kind = "eye"
