@@ -415,84 +415,173 @@ anchors_preset = 9
 anchor_bottom = 1.0
 offset_left = 20.0
 offset_top = 90.0
-offset_right = 290.0
+offset_right = 320.0
 offset_bottom = -20.0
 grow_vertical = 2
 
-[node name="Margin" type="MarginContainer" parent="PaintPanel"]
+[node name="Scroll" type="ScrollContainer" parent="PaintPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 15
-theme_override_constants/margin_right = 15
-theme_override_constants/margin_bottom = 15
+horizontal_scroll_mode = 0
 
-[node name="VBox" type="VBoxContainer" parent="PaintPanel/Margin"]
+[node name="Margin" type="MarginContainer" parent="PaintPanel/Scroll"]
 layout_mode = 2
-theme_override_constants/separation = 14
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
 
-[node name="Title" type="Label" parent="PaintPanel/Margin/VBox"]
+[node name="VBox" type="VBoxContainer" parent="PaintPanel/Scroll/Margin"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "Editor de Pele & Pintura"
+theme_override_constants/separation = 10
 
-[node name="HSeparator" type="HSeparator" parent="PaintPanel/Margin/VBox"]
+[node name="Title" type="Label" parent="PaintPanel/Scroll/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "🎨 Editor de Pele & Pintura"
+
+[node name="HSeparator" type="HSeparator" parent="PaintPanel/Scroll/Margin/VBox"]
 layout_mode = 2
 
-[node name="LblPrimary" type="Label" parent="PaintPanel/Margin/VBox"]
+[node name="LblPattern" type="Label" parent="PaintPanel/Scroll/Margin/VBox"]
 layout_mode = 2
-text = "Cor Primária:"
+theme_override_font_sizes/font_size = 12
+text = "Estilo / Padrão de Pele:"
 
-[node name="PrimaryColorPicker" type="ColorPickerButton" parent="PaintPanel/Margin/VBox"]
+[node name="OptionSkinPattern" type="OptionButton" parent="PaintPanel/Scroll/Margin/VBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+focus_mode = 0
+
+[node name="LblPrimary" type="Label" parent="PaintPanel/Scroll/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Cor Primária (Base):"
+
+[node name="PrimaryColorPicker" type="ColorPickerButton" parent="PaintPanel/Scroll/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 color = Color(0.85, 0.45, 0.35, 1)
 
-[node name="LblSecondary" type="Label" parent="PaintPanel/Margin/VBox"]
+[node name="LblSecondary" type="Label" parent="PaintPanel/Scroll/Margin/VBox"]
 layout_mode = 2
-text = "Cor Secundária:"
+theme_override_font_sizes/font_size = 12
+text = "Cor Secundária (Padrão):"
 
-[node name="SecondaryColorPicker" type="ColorPickerButton" parent="PaintPanel/Margin/VBox"]
+[node name="SecondaryColorPicker" type="ColorPickerButton" parent="PaintPanel/Scroll/Margin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 32)
+custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 color = Color(0.3, 0.15, 0.1, 1)
 
-[node name="HBoxScale" type="HBoxContainer" parent="PaintPanel/Margin/VBox"]
+[node name="HBoxBlend" type="HBoxContainer" parent="PaintPanel/Scroll/Margin/VBox"]
 layout_mode = 2
 
-[node name="LblScale" type="Label" parent="PaintPanel/Margin/VBox/HBoxScale"]
+[node name="LblBlend" type="Label" parent="PaintPanel/Scroll/Margin/VBox/HBoxBlend"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Escala Textura:"
+theme_override_font_sizes/font_size = 11
+text = "Intensidade do Padrão:"
 
-[node name="LblTextureScaleVal" type="Label" parent="PaintPanel/Margin/VBox/HBoxScale"]
+[node name="LblPatternBlendVal" type="Label" parent="PaintPanel/Scroll/Margin/VBox/HBoxBlend"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "50%"
+
+[node name="SliderPatternBlend" type="HSlider" parent="PaintPanel/Scroll/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+value = 0.5
+
+[node name="HBoxScale" type="HBoxContainer" parent="PaintPanel/Scroll/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblScale" type="Label" parent="PaintPanel/Scroll/Margin/VBox/HBoxScale"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+text = "Escala da Textura:"
+
+[node name="LblTextureScaleVal" type="Label" parent="PaintPanel/Scroll/Margin/VBox/HBoxScale"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
 text = "2.0x"
 
-[node name="SliderTextureScale" type="HSlider" parent="PaintPanel/Margin/VBox"]
+[node name="SliderTextureScale" type="HSlider" parent="PaintPanel/Scroll/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = 0.5
-max_value = 10.0
+max_value = 8.0
 step = 0.1
 value = 2.0
 
-[node name="HBoxSSS" type="HBoxContainer" parent="PaintPanel/Margin/VBox"]
+[node name="HBoxNormal" type="HBoxContainer" parent="PaintPanel/Scroll/Margin/VBox"]
 layout_mode = 2
 
-[node name="LblSSS" type="Label" parent="PaintPanel/Margin/VBox/HBoxSSS"]
+[node name="LblNormal" type="Label" parent="PaintPanel/Scroll/Margin/VBox/HBoxNormal"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Brilho SSS:"
+theme_override_font_sizes/font_size = 11
+text = "Relevo 3D (Normal):"
 
-[node name="LblSSSVal" type="Label" parent="PaintPanel/Margin/VBox/HBoxSSS"]
+[node name="LblNormalScaleVal" type="Label" parent="PaintPanel/Scroll/Margin/VBox/HBoxNormal"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "1.0x"
+
+[node name="SliderNormalScale" type="HSlider" parent="PaintPanel/Scroll/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 3.0
+step = 0.1
+value = 1.0
+
+[node name="HBoxRoughness" type="HBoxContainer" parent="PaintPanel/Scroll/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblRoughness" type="Label" parent="PaintPanel/Scroll/Margin/VBox/HBoxRoughness"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+text = "Aspereza / Brilho:"
+
+[node name="LblRoughnessVal" type="Label" parent="PaintPanel/Scroll/Margin/VBox/HBoxRoughness"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "0.50"
+
+[node name="SliderRoughness" type="HSlider" parent="PaintPanel/Scroll/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 0.05
+max_value = 0.95
+step = 0.05
+value = 0.5
+
+[node name="HBoxSSS" type="HBoxContainer" parent="PaintPanel/Scroll/Margin/VBox"]
+layout_mode = 2
+
+[node name="LblSSS" type="Label" parent="PaintPanel/Scroll/Margin/VBox/HBoxSSS"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+text = "Translucidez (SSS):"
+
+[node name="LblSSSVal" type="Label" parent="PaintPanel/Scroll/Margin/VBox/HBoxSSS"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
 text = "0.30"
 
-[node name="SliderSSS" type="HSlider" parent="PaintPanel/Margin/VBox"]
+[node name="SliderSSS" type="HSlider" parent="PaintPanel/Scroll/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 max_value = 2.0

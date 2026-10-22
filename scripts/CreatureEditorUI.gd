@@ -64,13 +64,20 @@ var current_appendage_category: String = "all"
 var _active_appendage_id: String = "leg_claw"
 var _category_buttons: Dictionary = {}
 
-# Referências da UI - Painel de Pintura
+# Referências da UI - Painel de Pintura & Texturas
 @onready var paint_panel: PanelContainer = %PaintPanel
+@onready var option_skin_pattern: OptionButton = %OptionSkinPattern
 @onready var primary_color_picker: ColorPickerButton = %PrimaryColorPicker
 @onready var secondary_color_picker: ColorPickerButton = %SecondaryColorPicker
+@onready var slider_pattern_blend: HSlider = %SliderPatternBlend
+@onready var lbl_pattern_blend_val: Label = %LblPatternBlendVal
 @onready var slider_texture_scale: HSlider = %SliderTextureScale
-@onready var slider_sss: HSlider = %SliderSSS
 @onready var lbl_texture_scale_val: Label = %LblTextureScaleVal
+@onready var slider_normal_scale: HSlider = %SliderNormalScale
+@onready var lbl_normal_scale_val: Label = %LblNormalScaleVal
+@onready var slider_roughness: HSlider = %SliderRoughness
+@onready var lbl_roughness_val: Label = %LblRoughnessVal
+@onready var slider_sss: HSlider = %SliderSSS
 @onready var lbl_sss_val: Label = %LblSSSVal
 
 # Referências da UI - Painel de Habilidades e Hotbar (Q, E, R, F, V)
@@ -238,13 +245,21 @@ func _setup_signals() -> void:
 
 	_set_appendage_category("all")
 
-	# 6. Painel de Pintura
+	# 6. Painel de Pintura & Texturas
+	if option_skin_pattern and not option_skin_pattern.item_selected.is_connected(_on_skin_pattern_selected):
+		option_skin_pattern.item_selected.connect(_on_skin_pattern_selected)
 	if primary_color_picker and not primary_color_picker.color_changed.is_connected(_on_primary_color_changed):
 		primary_color_picker.color_changed.connect(_on_primary_color_changed)
 	if secondary_color_picker and not secondary_color_picker.color_changed.is_connected(_on_secondary_color_changed):
 		secondary_color_picker.color_changed.connect(_on_secondary_color_changed)
+	if slider_pattern_blend and not slider_pattern_blend.value_changed.is_connected(_on_pattern_blend_changed):
+		slider_pattern_blend.value_changed.connect(_on_pattern_blend_changed)
 	if slider_texture_scale and not slider_texture_scale.value_changed.is_connected(_on_texture_scale_changed):
 		slider_texture_scale.value_changed.connect(_on_texture_scale_changed)
+	if slider_normal_scale and not slider_normal_scale.value_changed.is_connected(_on_normal_scale_changed):
+		slider_normal_scale.value_changed.connect(_on_normal_scale_changed)
+	if slider_roughness and not slider_roughness.value_changed.is_connected(_on_roughness_changed):
+		slider_roughness.value_changed.connect(_on_roughness_changed)
 	if slider_sss and not slider_sss.value_changed.is_connected(_on_sss_changed):
 		slider_sss.value_changed.connect(_on_sss_changed)
 
@@ -271,14 +286,36 @@ func _get_hotbar_buttons() -> Array[SkillSlotButton]:
 	return [slot_q, slot_e, slot_r, slot_f, slot_v]
 
 func _init_ui_values() -> void:
+	if option_skin_pattern:
+		option_skin_pattern.clear()
+		option_skin_pattern.add_item("🦖 Clássico Spore", 0)
+		option_skin_pattern.add_item("🦎 Escamas de Dragão", 1)
+		option_skin_pattern.add_item("🦏 Couro Enrugado", 2)
+		option_skin_pattern.add_item("🐅 Listras de Predador", 3)
+		option_skin_pattern.add_item("🐆 Manchas de Leopardo", 4)
+		option_skin_pattern.add_item("🪲 Carapaça de Quitina", 5)
+		option_skin_pattern.add_item("🐸 Anfíbio Bioluminescente", 6)
+		option_skin_pattern.selected = 0
 	if primary_color_picker:
 		primary_color_picker.color = Color(0.85, 0.45, 0.35, 1.0)
 	if secondary_color_picker:
 		secondary_color_picker.color = Color(0.3, 0.15, 0.1, 1.0)
+	if slider_pattern_blend:
+		slider_pattern_blend.value = 0.5
+		if lbl_pattern_blend_val:
+			lbl_pattern_blend_val.text = "50%"
 	if slider_texture_scale:
 		slider_texture_scale.value = 2.0
 		if lbl_texture_scale_val:
 			lbl_texture_scale_val.text = "2.0x"
+	if slider_normal_scale:
+		slider_normal_scale.value = 1.0
+		if lbl_normal_scale_val:
+			lbl_normal_scale_val.text = "1.0x"
+	if slider_roughness:
+		slider_roughness.value = 0.5
+		if lbl_roughness_val:
+			lbl_roughness_val.text = "0.50"
 	if slider_sss:
 		slider_sss.value = 0.3
 		if lbl_sss_val:
@@ -586,6 +623,24 @@ func _sync_ui_after_load() -> void:
 				slider_sss.set_value_no_signal(float(sss))
 				if lbl_sss_val:
 					lbl_sss_val.text = "%.2f" % float(sss)
+			var spt = mat.get_shader_parameter("skin_pattern_type")
+			if spt != null and option_skin_pattern:
+				option_skin_pattern.select(clampi(int(spt), 0, option_skin_pattern.item_count - 1))
+			var pb = mat.get_shader_parameter("pattern_blend")
+			if pb != null and slider_pattern_blend:
+				slider_pattern_blend.set_value_no_signal(float(pb))
+				if lbl_pattern_blend_val:
+					lbl_pattern_blend_val.text = "%d%%" % int(float(pb) * 100)
+			var ns = mat.get_shader_parameter("normal_scale")
+			if ns != null and slider_normal_scale:
+				slider_normal_scale.set_value_no_signal(float(ns))
+				if lbl_normal_scale_val:
+					lbl_normal_scale_val.text = "%.1fx" % float(ns)
+			var rough = mat.get_shader_parameter("roughness")
+			if rough != null and slider_roughness:
+				slider_roughness.set_value_no_signal(float(rough))
+				if lbl_roughness_val:
+					lbl_roughness_val.text = "%.2f" % float(rough)
 
 	if creature_data:
 		_on_biomass_changed(creature_data.current_biomass, creature_data.max_biomass)
@@ -1401,7 +1456,29 @@ func _on_skill_triggered(slot_key: String, skill_data: Dictionary) -> void:
 	if lbl_part_info:
 		lbl_part_info.text = "⚡ [%s] %s ativada!" % [slot_key, sk_name]
 
-# --- Callbacks do ApplyCreatureShader (Pintura) ---
+# --- Callbacks do ApplyCreatureShader (Pintura & Texturas) ---
+
+func _on_skin_pattern_selected(index: int) -> void:
+	if body_mesh and body_mesh.has_method("set_skin_pattern"):
+		body_mesh.call("set_skin_pattern", index)
+
+func _on_pattern_blend_changed(value: float) -> void:
+	if lbl_pattern_blend_val:
+		lbl_pattern_blend_val.text = "%d%%" % int(value * 100)
+	if body_mesh and body_mesh.has_method("set_pattern_blend"):
+		body_mesh.call("set_pattern_blend", value)
+
+func _on_normal_scale_changed(value: float) -> void:
+	if lbl_normal_scale_val:
+		lbl_normal_scale_val.text = "%.1fx" % value
+	if body_mesh and body_mesh.has_method("set_normal_scale"):
+		body_mesh.call("set_normal_scale", value)
+
+func _on_roughness_changed(value: float) -> void:
+	if lbl_roughness_val:
+		lbl_roughness_val.text = "%.2f" % value
+	if body_mesh and body_mesh.has_method("set_roughness"):
+		body_mesh.call("set_roughness", value)
 
 func _on_primary_color_changed(color: Color) -> void:
 	if body_mesh and body_mesh.has_method("set_base_color"):

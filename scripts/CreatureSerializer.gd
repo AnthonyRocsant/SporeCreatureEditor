@@ -346,7 +346,10 @@ func _serialize_skin_shader() -> Dictionary:
 		"secondary_color": [0.30, 0.15, 0.10, 1.0],
 		"texture_scale": 2.0,
 		"sss_strength": 0.3,
-		"sss_translucency": 0.25
+		"sss_translucency": 0.25,
+		"skin_pattern_type": 0,
+		"roughness": 0.5,
+		"normal_scale": 1.0
 	}
 	if body_mesh and body_mesh.has_method("get_creature_material"):
 		var mat: ShaderMaterial = body_mesh.call("get_creature_material")
@@ -363,6 +366,15 @@ func _serialize_skin_shader() -> Dictionary:
 			var sss = mat.get_shader_parameter("sss_strength")
 			if sss != null:
 				result["sss_strength"] = float(sss)
+			var spt = mat.get_shader_parameter("skin_pattern_type")
+			if spt != null:
+				result["skin_pattern_type"] = int(spt)
+			var rough = mat.get_shader_parameter("roughness")
+			if rough != null:
+				result["roughness"] = float(rough)
+			var norm = mat.get_shader_parameter("normal_scale")
+			if norm != null:
+				result["normal_scale"] = float(norm)
 	return result
 
 func _deserialize_skin_shader(skin_data: Dictionary) -> void:
@@ -373,6 +385,9 @@ func _deserialize_skin_shader(skin_data: Dictionary) -> void:
 	var tex_scale: float = float(skin_data.get("texture_scale", 2.0))
 	var sss_str: float = float(skin_data.get("sss_strength", 0.3))
 	var sss_trans: float = float(skin_data.get("sss_translucency", 0.25))
+	var pattern_type: int = int(skin_data.get("skin_pattern_type", 0))
+	var rough: float = float(skin_data.get("roughness", 0.5))
+	var norm_scale: float = float(skin_data.get("normal_scale", 1.0))
 
 	var bc = _array_to_color(bc_arr)
 	var sc = _array_to_color(sc_arr)
@@ -385,6 +400,12 @@ func _deserialize_skin_shader(skin_data: Dictionary) -> void:
 		body_mesh.call("set_texture_scale", tex_scale)
 	if body_mesh.has_method("set_sss_properties"):
 		body_mesh.call("set_sss_properties", bc, sss_str, sss_trans)
+	if body_mesh.has_method("set_skin_pattern"):
+		body_mesh.call("set_skin_pattern", pattern_type)
+	if body_mesh.has_method("set_roughness"):
+		body_mesh.call("set_roughness", rough)
+	if body_mesh.has_method("set_normal_scale"):
+		body_mesh.call("set_normal_scale", norm_scale)
 
 static func _vec3_to_array(v: Vector3) -> Array:
 	return [snappedf(v.x, 0.0001), snappedf(v.y, 0.0001), snappedf(v.z, 0.0001)]

@@ -38,6 +38,16 @@ func set_secondary_color(color: Color) -> void:
 func set_pattern_blend(factor: float) -> void:
 	get_creature_material().set_shader_parameter("pattern_blend", clampf(factor, 0.0, 1.0))
 
+func set_skin_pattern(pattern_idx: int) -> void:
+	get_creature_material().set_shader_parameter("skin_pattern_type", clampi(pattern_idx, 0, 6))
+
+func get_skin_pattern() -> int:
+	var val = get_creature_material().get_shader_parameter("skin_pattern_type")
+	return int(val) if val != null else 0
+
+func set_normal_scale(scale_val: float) -> void:
+	get_creature_material().set_shader_parameter("normal_scale", clampf(scale_val, 0.0, 5.0))
+
 func set_texture_scale(scale_value: float) -> void:
 	get_creature_material().set_shader_parameter("texture_scale", maxf(0.01, scale_value))
 
