@@ -5,3 +5,4 @@
 [node name="EyeCyclops" type="Node3D"]
 script = ExtResource("1_visuals")
 appendage_kind = "eye_cyclops"
+

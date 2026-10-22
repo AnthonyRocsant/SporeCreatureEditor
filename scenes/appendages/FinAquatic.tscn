@@ -5,3 +5,4 @@
 [node name="FinAquatic" type="Node3D"]
 script = ExtResource("1_visuals")
 appendage_kind = "fin_aquatic"
+

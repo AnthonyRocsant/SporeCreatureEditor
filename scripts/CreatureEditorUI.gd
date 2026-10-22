@@ -803,9 +803,9 @@ const APPENDAGE_CATALOG: Array[Dictionary] = [
 		"category_name": "Patas",
 		"category_icon": "🦵",
 		"id": "leg_heavy",
-		"name": "Pata Pesada Esmagadora",
+		"name": "Pata Pesada Titânica",
 		"icon": "💥",
-		"scene": "res://scenes/appendages/LegClaw.tscn",
+		"scene": "res://scenes/appendages/LegHeavy.tscn",
 		"type": "leg",
 		"category": "leg",
 		"tag": "#Claw_Heavy",
@@ -814,7 +814,7 @@ const APPENDAGE_CATALOG: Array[Dictionary] = [
 		"leg_force": 6.5,
 		"wing_area": 0.0,
 		"carapace_defense": 5.0,
-		"desc": "Perna maciça com força de impacto. Habilidade: Pisotão Sísmico. Custo: 8 + escala."
+		"desc": "Pilar colunar maciço estilo paquiderme/sauropoda com escudos no joelho e 4 cascos esmagadores. Habilidade: Pisotão Sísmico. Custo: 8 + escala."
 	},
 	{
 		"category_id": "leg",
@@ -869,24 +869,6 @@ const APPENDAGE_CATALOG: Array[Dictionary] = [
 		"wing_area": 0.0,
 		"carapace_defense": 8.0,
 		"desc": "Pinça colossal de caranguejo com dentes de esmagamento. Habilidade: Pinça Esmagadora. Custo: 8 + escala."
-	},
-	{
-		"category_id": "leg",
-		"category_name": "Patas",
-		"category_icon": "🦵",
-		"id": "tentacle_grip",
-		"name": "Tentáculo Abissal",
-		"icon": "🐙",
-		"scene": "res://scenes/appendages/TentacleSuction.tscn",
-		"type": "leg",
-		"category": "leg",
-		"tag": "#Tentacle_Grip",
-		"mass": 1.3,
-		"base_damage": 11.0,
-		"leg_force": 4.0,
-		"wing_area": 0.0,
-		"carapace_defense": 2.0,
-		"desc": "Tentáculo sinuoso com ventosas duplas aderentes. Habilidade: Constrição Abissal. Custo: 8 + escala."
 	},
 
 	# 👁️ OLHOS & SENTIDOS
@@ -1132,19 +1114,19 @@ const APPENDAGE_CATALOG: Array[Dictionary] = [
 		"category_id": "wing",
 		"category_name": "Asas",
 		"category_icon": "🪽",
-		"id": "wing_seraph",
-		"name": "Asa Serafim Majestosa",
-		"icon": "🪽",
-		"scene": "res://scenes/appendages/WingSeraph.tscn",
+		"id": "wing_butterfly",
+		"name": "Asa de Borboleta Mística",
+		"icon": "🦋",
+		"scene": "res://scenes/appendages/WingButterfly.tscn",
 		"type": "wing",
 		"category": "wing",
-		"tag": "#Wing_Seraph",
-		"mass": 1.1,
-		"base_damage": 5.0,
+		"tag": "#Wing_Butterfly",
+		"mass": 0.6,
+		"base_damage": 3.0,
 		"leg_force": 0.0,
-		"wing_area": 3.5,
-		"carapace_defense": 3.0,
-		"desc": "Asa sagrada multicamadas com rêmiges douradas. Voo supremo e manobrabilidade. Custo: 12 + escala."
+		"wing_area": 3.2,
+		"carapace_defense": 2.0,
+		"desc": "Asa ampla lepidóptera com cauda de fada, nervuras radiais e ocelos brilhantes. Voo gracioso. Custo: 12 + escala."
 	},
 
 	# ⚔️ DEFESA & CHIFRES

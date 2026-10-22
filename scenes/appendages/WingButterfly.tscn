@@ -2,6 +2,6 @@
 
 [ext_resource type="Script" path="res://scripts/ProceduralAppendageVisuals.gd" id="1_visuals"]
 
-[node name="WingSeraph" type="Node3D"]
+[node name="WingButterfly" type="Node3D"]
 script = ExtResource("1_visuals")
-appendage_kind = "wing_seraph"
+appendage_kind = "wing_butterfly"

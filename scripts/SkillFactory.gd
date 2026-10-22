@@ -233,15 +233,15 @@ const SKILL_CATALOG: Dictionary = {
 		"cooldown": 3.5,
 		"icon": "🦞"
 	},
-	"#Tentacle_Grip": {
-		"id": "abyssal_constrict",
-		"tag": "#Tentacle_Grip",
-		"name": "Constrição Abissal",
-		"description": "Prende o alvo com ventosas e drena mobilidade",
-		"effect_type": "dot_poison",
-		"base_impact": 86.0,
+	"#Wing_Butterfly": {
+		"id": "fairy_gust",
+		"tag": "#Wing_Butterfly",
+		"name": "Vendaval Místico de Ocelos",
+		"description": "Bate de asas lepidóptero com pólen atordoante e agilidade aérea",
+		"effect_type": "aerial_dash",
+		"base_impact": 88.0,
 		"cooldown": 4.0,
-		"icon": "🐙"
+		"icon": "🦋"
 	},
 	"#Tail_Scorpion": {
 		"id": "neurotoxic_sting",
@@ -272,16 +272,6 @@ const SKILL_CATALOG: Dictionary = {
 		"base_impact": 98.0,
 		"cooldown": 5.0,
 		"icon": "🦏"
-	},
-	"#Wing_Seraph": {
-		"id": "seraph_ascension",
-		"tag": "#Wing_Seraph",
-		"name": "Ascensão Serena",
-		"description": "Bate de asas sagrado com vendaval radiante e elevação máxima",
-		"effect_type": "aerial_dash",
-		"base_impact": 92.0,
-		"cooldown": 4.0,
-		"icon": "🪽"
 	},
 	"#Eye_Cyclops": {
 		"id": "dread_gaze",

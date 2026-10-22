@@ -2,6 +2,6 @@
 
 [ext_resource type="Script" path="res://scripts/ProceduralAppendageVisuals.gd" id="1_visuals"]
 
-[node name="TentacleSuction" type="Node3D"]
+[node name="LegHeavy" type="Node3D"]
 script = ExtResource("1_visuals")
-appendage_kind = "tentacle"
+appendage_kind = "leg_heavy"

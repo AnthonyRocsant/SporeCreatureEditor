@@ -5,3 +5,4 @@
 [node name="HornRhino" type="Node3D"]
 script = ExtResource("1_visuals")
 appendage_kind = "horn_rhino"
+

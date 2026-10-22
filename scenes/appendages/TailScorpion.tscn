@@ -5,3 +5,4 @@
 [node name="TailScorpion" type="Node3D"]
 script = ExtResource("1_visuals")
 appendage_kind = "tail_scorpion"
+
