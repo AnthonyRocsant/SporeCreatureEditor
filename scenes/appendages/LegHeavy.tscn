@@ -5,3 +5,4 @@
 [node name="LegHeavy" type="Node3D"]
 script = ExtResource("1_visuals")
 appendage_kind = "leg_heavy"
+

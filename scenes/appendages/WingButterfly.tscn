@@ -5,3 +5,4 @@
 [node name="WingButterfly" type="Node3D"]
 script = ExtResource("1_visuals")
 appendage_kind = "wing_butterfly"
+
