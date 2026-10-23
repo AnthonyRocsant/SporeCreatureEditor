@@ -33,20 +33,7 @@ func _ready() -> void:
 	attachment_system.creature_root = $CreatureRoot
 	attachment_system.spine_controller = spine_controller
 	attachment_system.connect_spine_signals()
-	attachment_system.set_active_part(
-		preload("res://scenes/appendages/LegClaw.tscn"),
-		{
-			"type": "leg",
-			"category": "leg",
-			"tag": "#Claw_Front",
-			"name": "Pata / Garra",
-			"mass": 1.2,
-			"base_damage": 8.0,
-			"leg_force": 4.2,
-			"wing_area": 0.0,
-			"carapace_defense": 2.0
-		}
-	)
+	attachment_system.clear_active_part()
 
 	# 3. Configura a fábrica de habilidades anatômicas (Pilar 3)
 	skill_factory = SkillFactory.new()

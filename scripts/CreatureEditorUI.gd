@@ -213,6 +213,10 @@ func _setup_signals() -> void:
 			attachment_system.scale_changed.connect(_on_attachment_scale_changed)
 		if not attachment_system.part_selected.is_connected(_on_attachment_part_selected):
 			attachment_system.part_selected.connect(_on_attachment_part_selected)
+		if not attachment_system.part_deselected.is_connected(_on_attachment_part_deselected):
+			attachment_system.part_deselected.connect(_on_attachment_part_deselected)
+		if not attachment_system.part_attached.is_connected(_on_attachment_part_attached):
+			attachment_system.part_attached.connect(_on_attachment_part_attached)
 
 	_category_buttons = {
 		"all": btn_cat_all,
@@ -701,7 +705,20 @@ func _on_attachment_part_selected(part_data: Dictionary) -> void:
 	if lbl_part_info:
 		var p_name = str(part_data.get("name", "Membro"))
 		var p_cost = int(part_data.get("cost", 0))
-		lbl_part_info.text = "Selecionado: %s (%d pts). Use Scroll/Q,E para girar, Shift+Scroll/Z,X para escalar ou Delete para excluir." % [p_name, p_cost]
+		lbl_part_info.text = "Selecionado: %s (%d pts). Arraste no corpo para mover, use Scroll/Q,E para girar, Shift+Scroll/Z,X para escalar ou Delete para excluir." % [p_name, p_cost]
+	if btn_delete_selected_part:
+		btn_delete_selected_part.disabled = false
+
+func _on_attachment_part_deselected() -> void:
+	if lbl_part_info and _active_appendage_id == "":
+		lbl_part_info.text = "Clique em um apêndice na criatura para selecioná-lo e alterar posição, ângulo ou tamanho."
+	if btn_delete_selected_part:
+		btn_delete_selected_part.disabled = true
+
+func _on_attachment_part_attached(_part_node: Node3D) -> void:
+	_deselect_catalog_part()
+	if lbl_part_info:
+		lbl_part_info.text = "Apêndice fixado! Clique nele para selecioná-lo e alterar posição, ângulo ou tamanho."
 
 # --- Catálogo Oficial de 20 Apêndices Categorizados (Bocas, Patas, Olhos, Rabos, Asas, Defesa) ---
 const APPENDAGE_CATALOG: Array[Dictionary] = [
@@ -1322,7 +1339,13 @@ func _populate_appendage_catalog() -> void:
 		appendage_item_list.add_child(btn)
 
 func _select_catalog_part(item: Dictionary) -> void:
-	_active_appendage_id = str(item.get("id", ""))
+	var item_id = str(item.get("id", ""))
+	# Se clicou no mesmo item da lista (duplo clique ou 2º clique): cancela e desseleciona!
+	if _active_appendage_id == item_id:
+		_deselect_catalog_part()
+		return
+
+	_active_appendage_id = item_id
 	var scene_path = str(item.get("scene", ""))
 	if ResourceLoader.exists(scene_path):
 		var packed = load(scene_path) as PackedScene
@@ -1330,8 +1353,16 @@ func _select_catalog_part(item: Dictionary) -> void:
 			attachment_system.set_active_part(packed, item)
 
 	if lbl_part_info:
-		lbl_part_info.text = "%s %s: %s" % [item.icon, item.name, item.desc]
+		lbl_part_info.text = "%s %s: %s (Clique no corpo para fixar. Clique novamente na lista para cancelar)" % [item.icon, item.name, item.desc]
 
+	_update_appendage_item_buttons_modulate()
+
+func _deselect_catalog_part() -> void:
+	_active_appendage_id = ""
+	if attachment_system:
+		attachment_system.clear_active_part()
+	if lbl_part_info:
+		lbl_part_info.text = "Seleção de apêndice cancelada. Clique em um apêndice anexado para editá-lo."
 	_update_appendage_item_buttons_modulate()
 
 func _update_appendage_item_buttons_modulate() -> void:
