@@ -113,6 +113,46 @@ const SKILL_CATALOG: Dictionary = {
 		"cooldown": 3.0,
 		"icon": "🦅"
 	},
+	"#Mouth_Saber": {
+		"id": "saber_pounce",
+		"tag": "#Mouth_Saber",
+		"name": "Bote Predatório",
+		"description": "Salto letal com dano crítico massivo e sangramento",
+		"effect_type": "lifesteal_melee",
+		"base_impact": 110.0,
+		"cooldown": 4.0,
+		"icon": "🗡️"
+	},
+	"#Mouth_Shark": {
+		"id": "shark_frenzy",
+		"tag": "#Mouth_Shark",
+		"name": "Frenesi do Megalodonte",
+		"description": "Rajada contínua de mordidas dilaceradoras",
+		"effect_type": "fast_combo",
+		"base_impact": 105.0,
+		"cooldown": 3.8,
+		"icon": "🦈"
+	},
+	"#Mouth_Lamprey": {
+		"id": "parasite_drain",
+		"tag": "#Mouth_Lamprey",
+		"name": "Dreno Parasitário",
+		"description": "Sucção contínua que drena vida e reduz velocidade do alvo",
+		"effect_type": "lifesteal_melee",
+		"base_impact": 88.0,
+		"cooldown": 3.2,
+		"icon": "🌀"
+	},
+	"#Mouth_Dragon": {
+		"id": "dragon_breath",
+		"tag": "#Mouth_Dragon",
+		"name": "Sopro Dracônico",
+		"description": "Cone frontal devastador de fogo e energia",
+		"effect_type": "aoe_frontal_stun",
+		"base_impact": 118.0,
+		"cooldown": 5.0,
+		"icon": "🔥"
+	},
 	"#Leg_Hoof": {
 		"id": "trample_hoof",
 		"tag": "#Leg_Hoof",

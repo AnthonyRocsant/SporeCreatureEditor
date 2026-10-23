@@ -14,6 +14,7 @@ extends Node3D
 @export_enum("leg", "leg_heavy", "leg_hoof", "leg_insect", "claw_pincer",
 	"wing", "wing_insect", "wing_feather", "wing_butterfly",
 	"mouth_carnivore", "mouth_herbivore", "mouth_insectoid", "mouth_beak",
+	"mouth_saber", "mouth_shark", "mouth_lamprey", "mouth_dragon",
 	"horn", "horn_antler", "horn_rhino", "spike_dorsal", "blade_bone", "fin_aquatic",
 	"tail", "tail_club", "tail_feather", "tail_scorpion",
 	"eye", "eye_compound", "eye_stalk", "eye_cyclops", "antenna_sensory")
@@ -63,6 +64,14 @@ func set_appendage_variant(variant_tag: String) -> void:
 			appendage_kind = "mouth_insectoid"
 		"#Mouth_Beak":
 			appendage_kind = "mouth_beak"
+		"#Mouth_Saber":
+			appendage_kind = "mouth_saber"
+		"#Mouth_Shark":
+			appendage_kind = "mouth_shark"
+		"#Mouth_Lamprey":
+			appendage_kind = "mouth_lamprey"
+		"#Mouth_Dragon":
+			appendage_kind = "mouth_dragon"
 		"#Wing_Membrane":
 			appendage_kind = "wing"
 		"#Wing_Insect":
@@ -156,6 +165,14 @@ func build_visuals() -> void:
 			_build_sculpted_insectoid_mouth(_visual_root)
 		"mouth_beak":
 			_build_sculpted_beak_mouth(_visual_root)
+		"mouth_saber":
+			_build_sculpted_saber_mouth(_visual_root)
+		"mouth_shark":
+			_build_sculpted_shark_mouth(_visual_root)
+		"mouth_lamprey":
+			_build_sculpted_lamprey_mouth(_visual_root)
+		"mouth_dragon":
+			_build_sculpted_dragon_mouth(_visual_root)
 		"horn":
 			_build_sculpted_horn(_visual_root)
 		"horn_antler":
@@ -1307,6 +1324,458 @@ func _build_sculpted_beak_mouth(root: Node3D) -> void:
 	]
 	var tongue_rads: Array[float] = [0.042, 0.028, 0.004]
 	beak_root.add_child(_create_lofted_tube(tongue_pts, tongue_rads, 8, mat_tongue, 0.0, 0.0, Vector2(1.2, 0.5)))
+
+# ==============================================================================
+# NOVA BOCA 1: MANDÍBULA DENTE-DE-SABRE (Caninos gigantescos, focinho felino e flanges)
+# ==============================================================================
+func _build_sculpted_saber_mouth(root: Node3D) -> void:
+	var mat_skin = _make_organic_material(primary_color, 0.44, 0.05, primary_color.lightened(0.2), 0.28)
+	var mat_lip = _make_organic_material(primary_color.darkened(0.25), 0.35, 0.0)
+	var mat_gum = _make_organic_material(Color(0.82, 0.20, 0.26).lerp(primary_color, 0.2), 0.20, 0.0, Color(0.95, 0.25, 0.25), 0.45)
+	var mat_saber = _make_keratin_material(Color(0.96, 0.94, 0.88), detail_color)
+	var mat_tooth = _make_keratin_material(Color(0.92, 0.90, 0.82), detail_color)
+	var mat_whisker = _make_keratin_material(primary_color.darkened(0.4), detail_color)
+
+	var saber_root = Node3D.new()
+	saber_root.name = "SaberMouthRoot"
+	root.add_child(saber_root)
+
+	# 1. Bochechas e músculos temporais/masseteres poderosos
+	for side in [-1.0, 1.0]:
+		var cheek_pts: Array[Vector3] = [
+			Vector3(side * 0.12, 0.02, 0.0),
+			Vector3(side * 0.16, 0.12, 0.02),
+			Vector3(side * 0.13, 0.22, -0.01)
+		]
+		var cheek_rads: Array[float] = [0.085, 0.095, 0.065]
+		saber_root.add_child(_create_lofted_tube(cheek_pts, cheek_rads, 12, mat_skin))
+
+	# 2. Maxilar Superior Felino com focinho largo e almofadas de bigodes (whisker pads)
+	var upper_pts: Array[Vector3] = [
+		Vector3(0.0, 0.0, 0.06),
+		Vector3(0.0, 0.16, 0.08),
+		Vector3(0.0, 0.30, 0.06),
+		Vector3(0.0, 0.40, 0.02)
+	]
+	var upper_rads: Array[float] = [0.18, 0.17, 0.14, 0.08]
+	saber_root.add_child(_create_lofted_tube(upper_pts, upper_rads, 16, mat_skin, 0.0, 0.0, Vector2(1.28, 0.78)))
+
+	# Almofadas de caninos/bigodes proeminentes nas laterais do focinho
+	for side in [-1.0, 1.0]:
+		var pad_pts: Array[Vector3] = [
+			Vector3(side * 0.07, 0.22, 0.04),
+			Vector3(side * 0.13, 0.30, 0.02),
+			Vector3(side * 0.11, 0.37, -0.01)
+		]
+		var pad_rads: Array[float] = [0.062, 0.068, 0.045]
+		saber_root.add_child(_create_lofted_tube(pad_pts, pad_rads, 10, mat_lip))
+
+		# Bigodes rígidos (vibrissas sensoriais)
+		for w_i in range(3):
+			var w_pts: Array[Vector3] = [
+				Vector3(side * 0.14, 0.30 + float(w_i) * 0.03, 0.02 - float(w_i) * 0.02),
+				Vector3(side * 0.26, 0.35 + float(w_i) * 0.04, 0.01 - float(w_i) * 0.03)
+			]
+			var w_rads: Array[float] = [0.006, 0.001]
+			saber_root.add_child(_create_lofted_tube(w_pts, w_rads, 4, mat_whisker))
+
+	# Trufa nasal felina esculpida
+	var nose_pts: Array[Vector3] = [
+		Vector3(0.0, 0.37, 0.05),
+		Vector3(0.0, 0.42, 0.03)
+	]
+	var nose_rads: Array[float] = [0.055, 0.035]
+	saber_root.add_child(_create_lofted_tube(nose_pts, nose_rads, 10, mat_lip, 0.0, 0.0, Vector2(1.4, 0.7)))
+
+	# 3. Mandíbula Inferior com Flanges Ósseos Verticais (proteção para os sabres)
+	var lower_pts: Array[Vector3] = [
+		Vector3(0.0, 0.0, -0.06),
+		Vector3(0.0, 0.14, -0.12),
+		Vector3(0.0, 0.28, -0.15),
+		Vector3(0.0, 0.37, -0.12)
+	]
+	var lower_rads: Array[float] = [0.15, 0.13, 0.10, 0.055]
+	saber_root.add_child(_create_lofted_tube(lower_pts, lower_rads, 14, mat_skin, 0.0, 0.0, Vector2(1.15, 0.85)))
+
+	for side in [-1.0, 1.0]:
+		var flange_pts: Array[Vector3] = [
+			Vector3(side * 0.08, 0.26, -0.13),
+			Vector3(side * 0.10, 0.34, -0.22)
+		]
+		var flange_rads: Array[float] = [0.045, 0.015]
+		saber_root.add_child(_create_lofted_tube(flange_pts, flange_rads, 8, mat_skin, 0.0, 0.0, Vector2(0.65, 1.35)))
+
+	# 4. OS DOIS GIGANTESCOS CANINOS DENTE-DE-SABRE (Curvos, serrilhados e letais)
+	for side in [-1.0, 1.0]:
+		var saber_pts: Array[Vector3] = [
+			Vector3(side * 0.105, 0.32, 0.02),
+			Vector3(side * 0.110, 0.34, -0.06),
+			Vector3(side * 0.105, 0.35, -0.16),
+			Vector3(side * 0.095, 0.33, -0.26),
+			Vector3(side * 0.085, 0.30, -0.32)
+		]
+		var saber_rads: Array[float] = [0.048, 0.042, 0.032, 0.018, 0.003]
+		saber_root.add_child(_create_lofted_tube(saber_pts, saber_rads, 12, mat_saber, 0.0, 0.0, Vector2(0.55, 1.45)))
+
+	# 5. Dentes incisivos frontais e caninos inferiores
+	for i in range(-2, 3):
+		var x_inc = float(i) * 0.028
+		var inc_pts: Array[Vector3] = [
+			Vector3(x_inc, 0.38, 0.01),
+			Vector3(x_inc, 0.39, -0.035)
+		]
+		var inc_rads: Array[float] = [0.012, 0.002]
+		saber_root.add_child(_create_lofted_tube(inc_pts, inc_rads, 6, mat_tooth))
+
+		var low_inc_pts: Array[Vector3] = [
+			Vector3(x_inc * 0.85, 0.35, -0.12),
+			Vector3(x_inc * 0.85, 0.36, -0.08)
+		]
+		var low_inc_rads: Array[float] = [0.011, 0.002]
+		saber_root.add_child(_create_lofted_tube(low_inc_pts, low_inc_rads, 6, mat_tooth))
+
+	# Língua felina com gengiva
+	var tongue_pts: Array[Vector3] = [
+		Vector3(0.0, 0.08, -0.04),
+		Vector3(0.0, 0.22, -0.07),
+		Vector3(0.0, 0.33, -0.08)
+	]
+	var tongue_rads: Array[float] = [0.08, 0.065, 0.02]
+	saber_root.add_child(_create_lofted_tube(tongue_pts, tongue_rads, 10, mat_gum, 0.0, 0.0, Vector2(1.4, 0.5)))
+
+# ==============================================================================
+# NOVA BOCA 2: MANDÍBULA DE TUBARÃO / MEGALODONTE (Fileiras múltiplas de dentes triangulares)
+# ==============================================================================
+func _build_sculpted_shark_mouth(root: Node3D) -> void:
+	var mat_shark_skin = _make_organic_material(primary_color.darkened(0.06), 0.30, 0.08, primary_color.lightened(0.15), 0.25)
+	var mat_jaw = _make_organic_material(primary_color.darkened(0.22), 0.36, 0.05)
+	var mat_gum = _make_organic_material(Color(0.85, 0.18, 0.22).lerp(primary_color, 0.18), 0.18, 0.0, Color(0.95, 0.22, 0.25), 0.48)
+	var mat_teeth = _make_keratin_material(Color(0.98, 0.98, 0.95), detail_color)
+	var mat_throat = _make_organic_material(Color(0.08, 0.02, 0.04), 0.75, 0.0)
+
+	var shark_root = Node3D.new()
+	shark_root.name = "SharkMouthRoot"
+	root.add_child(shark_root)
+
+	# 1. Focinho Hidrodinâmico Cônico e Arqueado Superior
+	var snout_pts: Array[Vector3] = [
+		Vector3(0.0, 0.0, 0.08),
+		Vector3(0.0, 0.16, 0.12),
+		Vector3(0.0, 0.32, 0.13),
+		Vector3(0.0, 0.44, 0.09)
+	]
+	var snout_rads: Array[float] = [0.18, 0.17, 0.13, 0.04]
+	shark_root.add_child(_create_lofted_tube(snout_pts, snout_rads, 16, mat_shark_skin, 0.0, 0.0, Vector2(1.35, 0.72)))
+
+	# 2. Abertura da Boca Ampla Semicircular com Fundo Escuro (Garganta Abissal)
+	var throat_mesh = MeshInstance3D.new()
+	var t_sph = SphereMesh.new()
+	t_sph.radius = 0.13
+	t_sph.height = 0.22
+	throat_mesh.mesh = t_sph
+	throat_mesh.position = Vector3(0.0, 0.15, -0.04)
+	throat_mesh.scale = Vector3(1.15, 0.7, 0.6)
+	throat_mesh.material_override = mat_throat
+	shark_root.add_child(throat_mesh)
+
+	# 3. Arco Mandibular Inferior Curvado Aberto (Cartilagem de Tubarão)
+	var lower_pts: Array[Vector3] = [
+		Vector3(0.0, 0.0, -0.08),
+		Vector3(0.0, 0.15, -0.16),
+		Vector3(0.0, 0.28, -0.18),
+		Vector3(0.0, 0.38, -0.14)
+	]
+	var lower_rads: Array[float] = [0.16, 0.14, 0.105, 0.045]
+	shark_root.add_child(_create_lofted_tube(lower_pts, lower_rads, 16, mat_jaw, 0.0, 0.0, Vector2(1.30, 0.75)))
+
+	# 4. Gengiva carnuda arqueada protuberante
+	var gum_upper_pts: Array[Vector3] = [
+		Vector3(0.0, 0.12, 0.02),
+		Vector3(0.0, 0.26, 0.04),
+		Vector3(0.0, 0.38, 0.02)
+	]
+	var gum_upper_rads: Array[float] = [0.12, 0.10, 0.05]
+	shark_root.add_child(_create_lofted_tube(gum_upper_pts, gum_upper_rads, 12, mat_gum, 0.0, 0.0, Vector2(1.4, 0.5)))
+
+	# 5. MÚLTIPLAS FILEIRAS DE DENTES TRIANGULARES SERRILHADOS
+	# Fileira Externa Principal (10 dentes superiores + 10 inferiores)
+	var x_teeth = [-0.14, -0.11, -0.08, -0.05, -0.02, 0.02, 0.05, 0.08, 0.11, 0.14]
+	for x_t in x_teeth:
+		var rad_dist = abs(x_t)
+		var y_pos = 0.38 - rad_dist * 0.95
+		var tooth_len = 0.065 - rad_dist * 0.15
+
+		# Dente superior apontando para baixo e levemente para trás
+		var u_t_pts: Array[Vector3] = [
+			Vector3(x_t, y_pos, 0.02),
+			Vector3(x_t * 0.95, y_pos - 0.01, 0.02 - tooth_len * 0.5),
+			Vector3(x_t * 0.90, y_pos - 0.02, 0.02 - tooth_len)
+		]
+		var u_t_rads: Array[float] = [0.022, 0.014, 0.002]
+		shark_root.add_child(_create_lofted_tube(u_t_pts, u_t_rads, 6, mat_teeth, 0.0, 0.0, Vector2(1.6, 0.5)))
+
+		# Dente inferior apontando para cima
+		var l_t_pts: Array[Vector3] = [
+			Vector3(x_t * 0.9, y_pos, -0.14),
+			Vector3(x_t * 0.85, y_pos - 0.01, -0.14 + tooth_len * 0.5),
+			Vector3(x_t * 0.80, y_pos - 0.02, -0.14 + tooth_len)
+		]
+		var l_t_rads: Array[float] = [0.019, 0.012, 0.002]
+		shark_root.add_child(_create_lofted_tube(l_t_pts, l_t_rads, 6, mat_teeth, 0.0, 0.0, Vector2(1.6, 0.5)))
+
+		# Fileira Interna Secundária (dentes de reposição inclinados para dentro)
+		if rad_dist < 0.12:
+			var u_inner: Array[Vector3] = [
+				Vector3(x_t * 0.88, y_pos - 0.04, 0.01),
+				Vector3(x_t * 0.85, y_pos - 0.06, 0.01 - tooth_len * 0.65)
+			]
+			var u_inner_rads: Array[float] = [0.015, 0.002]
+			shark_root.add_child(_create_lofted_tube(u_inner, u_inner_rads, 6, mat_teeth))
+
+	# Fendas branquiais e sulcos labiais estéticos
+	for side in [-1.0, 1.0]:
+		for g_i in range(3):
+			var gill = MeshInstance3D.new()
+			var g_cyl = CylinderMesh.new()
+			g_cyl.top_radius = 0.005
+			g_cyl.bottom_radius = 0.005
+			g_cyl.height = 0.075
+			gill.mesh = g_cyl
+			gill.position = Vector3(side * 0.16, 0.04 + float(g_i) * 0.04, -0.02)
+			gill.rotation = Vector3(0.3, 0.0, side * 0.4)
+			gill.material_override = mat_jaw
+			shark_root.add_child(gill)
+
+# ==============================================================================
+# NOVA BOCA 3: BOCA SUGADORA / LAMPREIA PARASITA (Ventosa circular com dentes em espiral)
+# ==============================================================================
+func _build_sculpted_lamprey_mouth(root: Node3D) -> void:
+	var mat_outer_rim = _make_organic_material(primary_color, 0.46, 0.06, primary_color.lightened(0.2), 0.35)
+	var mat_disc = _make_organic_material(Color(0.76, 0.20, 0.30).lerp(primary_color, 0.25), 0.22, 0.0, Color(0.96, 0.20, 0.25), 0.55)
+	var mat_teeth = _make_keratin_material(Color(0.96, 0.86, 0.45).lerp(secondary_color, 0.35), detail_color)
+	var mat_gullet = _make_organic_material(Color(0.12, 0.02, 0.04), 0.75, 0.0)
+
+	var lamprey_root = Node3D.new()
+	lamprey_root.name = "LampreyMouthRoot"
+	root.add_child(lamprey_root)
+
+	# 1. Corpo Muscular Cônico que se expande até a ventosa circular
+	var body_pts: Array[Vector3] = [
+		Vector3(0.0, 0.0, 0.0),
+		Vector3(0.0, 0.12, 0.01),
+		Vector3(0.0, 0.24, 0.02),
+		Vector3(0.0, 0.32, 0.02)
+	]
+	var body_rads: Array[float] = [0.14, 0.155, 0.185, 0.205]
+	lamprey_root.add_child(_create_lofted_tube(body_pts, body_rads, 20, mat_outer_rim, 0.04, 6.0))
+
+	# 2. Lábio Circular Carnudo Exterior com Franjas / Papilas Sensoriais
+	var rim_pts: Array[Vector3] = [
+		Vector3(0.0, 0.30, 0.02),
+		Vector3(0.0, 0.35, 0.02)
+	]
+	var rim_rads: Array[float] = [0.205, 0.220]
+	lamprey_root.add_child(_create_lofted_tube(rim_pts, rim_rads, 24, mat_outer_rim))
+
+	# Papilas periféricas da ventosa (franja sensorial externa com 16 gomos)
+	for p_i in range(16):
+		var angle = (float(p_i) / 16.0) * TAU
+		var p_pos = Vector3(sin(angle) * 0.215, 0.35, cos(angle) * 0.215 + 0.02)
+		var papilla = MeshInstance3D.new()
+		var p_sph = SphereMesh.new()
+		p_sph.radius = 0.016
+		p_sph.height = 0.028
+		papilla.mesh = p_sph
+		papilla.position = p_pos
+		papilla.material_override = mat_disc
+		lamprey_root.add_child(papilla)
+
+	# 3. Disco Sugador Côncavo voltado para a frente
+	var disc_pts: Array[Vector3] = [
+		Vector3(0.0, 0.35, 0.02),
+		Vector3(0.0, 0.31, 0.02),
+		Vector3(0.0, 0.25, 0.02)
+	]
+	var disc_rads: Array[float] = [0.205, 0.150, 0.075]
+	lamprey_root.add_child(_create_lofted_tube(disc_pts, disc_rads, 20, mat_disc))
+
+	# 4. Esôfago / Garganta Profunda Central
+	var gullet_mesh = MeshInstance3D.new()
+	var g_sph = SphereMesh.new()
+	g_sph.radius = 0.072
+	g_sph.height = 0.14
+	gullet_mesh.mesh = g_sph
+	gullet_mesh.position = Vector3(0.0, 0.23, 0.02)
+	gullet_mesh.material_override = mat_gullet
+	lamprey_root.add_child(gullet_mesh)
+
+	# 5. DENTES CÔRNEOS EM ESPIRAIS CONCÊNTRICAS (24 dentes no total)
+	# Anel Externo (12 dentes)
+	for i in range(12):
+		var a = (float(i) / 12.0) * TAU
+		var d_pos = Vector3(sin(a) * 0.165, 0.33, cos(a) * 0.165 + 0.02)
+		var t_tip = Vector3(sin(a) * 0.125, 0.28, cos(a) * 0.125 + 0.02)
+		var t_pts: Array[Vector3] = [d_pos, t_tip]
+		var t_rads: Array[float] = [0.018, 0.002]
+		lamprey_root.add_child(_create_lofted_tube(t_pts, t_rads, 6, mat_teeth))
+
+	# Anel Intermediário (8 dentes)
+	for i in range(8):
+		var a = (float(i) / 8.0) * TAU + 0.35
+		var d_pos = Vector3(sin(a) * 0.115, 0.30, cos(a) * 0.115 + 0.02)
+		var t_tip = Vector3(sin(a) * 0.085, 0.25, cos(a) * 0.085 + 0.02)
+		var t_pts: Array[Vector3] = [d_pos, t_tip]
+		var t_rads: Array[float] = [0.016, 0.002]
+		lamprey_root.add_child(_create_lofted_tube(t_pts, t_rads, 6, mat_teeth))
+
+	# Anel Interno (4 dentes farpados de ancoragem)
+	for i in range(4):
+		var a = (float(i) / 4.0) * TAU
+		var d_pos = Vector3(sin(a) * 0.075, 0.27, cos(a) * 0.075 + 0.02)
+		var t_tip = Vector3(sin(a) * 0.045, 0.22, cos(a) * 0.045 + 0.02)
+		var t_pts: Array[Vector3] = [d_pos, t_tip]
+		var t_rads: Array[float] = [0.014, 0.002]
+		lamprey_root.add_child(_create_lofted_tube(t_pts, t_rads, 6, mat_teeth))
+
+	# 6. Pistão Lingual Central com dente duplo de raspagem
+	var piston_pts: Array[Vector3] = [
+		Vector3(0.0, 0.19, 0.02),
+		Vector3(0.0, 0.26, 0.02)
+	]
+	var piston_rads: Array[float] = [0.038, 0.032]
+	lamprey_root.add_child(_create_lofted_tube(piston_pts, piston_rads, 10, mat_disc))
+
+	for side in [-1.0, 1.0]:
+		var tip_pts: Array[Vector3] = [
+			Vector3(side * 0.015, 0.26, 0.02),
+			Vector3(side * 0.025, 0.29, 0.02)
+		]
+		var tip_rads: Array[float] = [0.012, 0.002]
+		lamprey_root.add_child(_create_lofted_tube(tip_pts, tip_rads, 6, mat_teeth))
+
+# ==============================================================================
+# NOVA BOCA 4: MANDÍBULA DE DRAGÃO / RÉPTIL ANCESTRAL (Focinho escamado e língua bífida)
+# ==============================================================================
+func _build_sculpted_dragon_mouth(root: Node3D) -> void:
+	var mat_scales = _make_organic_material(primary_color.darkened(0.08), 0.35, 0.12, primary_color.lightened(0.2), 0.25)
+	var mat_plates = _make_keratin_material(secondary_color.darkened(0.35), detail_color)
+	var mat_gum = _make_organic_material(Color(0.68, 0.12, 0.18).lerp(primary_color, 0.2), 0.22, 0.0)
+	var mat_teeth = _make_keratin_material(Color(0.94, 0.92, 0.82), detail_color)
+	var mat_tongue = _make_organic_material(Color(0.85, 0.10, 0.25), 0.18, 0.0, Color(1.0, 0.2, 0.3), 0.55)
+	var mat_ember = StandardMaterial3D.new()
+	mat_ember.albedo_color = Color(1.0, 0.35, 0.1)
+	mat_ember.emission_enabled = true
+	mat_ember.emission = Color(1.0, 0.55, 0.1)
+	mat_ember.emission_energy_multiplier = 1.8
+
+	var dragon_root = Node3D.new()
+	dragon_root.name = "DragonMouthRoot"
+	root.add_child(dragon_root)
+
+	# 1. Focinho Reptiliano Longo com crista óssea esculpida
+	var snout_pts: Array[Vector3] = [
+		Vector3(0.0, 0.0, 0.05),
+		Vector3(0.0, 0.18, 0.08),
+		Vector3(0.0, 0.36, 0.07),
+		Vector3(0.0, 0.50, 0.03)
+	]
+	var snout_rads: Array[float] = [0.17, 0.155, 0.125, 0.065]
+	dragon_root.add_child(_create_lofted_tube(snout_pts, snout_rads, 16, mat_scales, 0.0, 0.0, Vector2(1.25, 0.80)))
+
+	# Crista óssea dorsal com placas pontiagudas sobre o focinho
+	for c_i in range(3):
+		var y_c = 0.18 + float(c_i) * 0.12
+		var scute_pts: Array[Vector3] = [
+			Vector3(0.0, y_c, 0.08 - float(c_i) * 0.01),
+			Vector3(0.0, y_c + 0.04, 0.15 - float(c_i) * 0.02)
+		]
+		var scute_rads: Array[float] = [0.035 - float(c_i) * 0.005, 0.004]
+		dragon_root.add_child(_create_lofted_tube(scute_pts, scute_rads, 6, mat_plates, 0.0, 0.0, Vector2(0.5, 1.8)))
+
+	# Dois pequenos cornos nasais ameaçadores na ponta do focinho
+	for side in [-1.0, 1.0]:
+		var hornlet_pts: Array[Vector3] = [
+			Vector3(side * 0.05, 0.44, 0.05),
+			Vector3(side * 0.08, 0.48, 0.12)
+		]
+		var hornlet_rads: Array[float] = [0.028, 0.003]
+		dragon_root.add_child(_create_lofted_tube(hornlet_pts, hornlet_rads, 8, mat_plates))
+
+		# Narinas flamejantes escavadas
+		var nostril = MeshInstance3D.new()
+		var n_sph = SphereMesh.new()
+		n_sph.radius = 0.018
+		n_sph.height = 0.032
+		nostril.mesh = n_sph
+		nostril.position = Vector3(side * 0.045, 0.46, 0.03)
+		nostril.material_override = mat_ember
+		dragon_root.add_child(nostril)
+
+	# 2. Mandíbula Inferior Longa com Queixo Escamado
+	var lower_pts: Array[Vector3] = [
+		Vector3(0.0, 0.0, -0.06),
+		Vector3(0.0, 0.16, -0.12),
+		Vector3(0.0, 0.32, -0.14),
+		Vector3(0.0, 0.46, -0.10)
+	]
+	var lower_rads: Array[float] = [0.15, 0.13, 0.098, 0.050]
+	dragon_root.add_child(_create_lofted_tube(lower_pts, lower_rads, 16, mat_scales, 0.0, 0.0, Vector2(1.20, 0.80)))
+
+	# 3. Flanges angulares espinhosos na articulação da mandíbula (jugais)
+	for side in [-1.0, 1.0]:
+		var cheek_spk: Array[Vector3] = [
+			Vector3(side * 0.13, 0.08, -0.02),
+			Vector3(side * 0.22, 0.14, 0.01),
+			Vector3(side * 0.28, 0.20, 0.03)
+		]
+		var cheek_spk_rads: Array[float] = [0.055, 0.032, 0.004]
+		dragon_root.add_child(_create_lofted_tube(cheek_spk, cheek_spk_rads, 8, mat_plates))
+
+	# 4. Dentes de Crocodilo/Dragão Intertravados (12 superiores e 12 inferiores)
+	for i in range(-5, 6):
+		var f_i = float(i)
+		var is_center = abs(i) <= 1
+		var is_great_fang = abs(i) == 3
+		var len_f = 1.45 if is_great_fang else (0.75 if is_center else 1.05)
+		var x_pos = f_i * 0.024
+		var y_pos = 0.46 - abs(f_i) * 0.032
+
+		# Dente superior apontando para baixo
+		var u_t_pts: Array[Vector3] = [
+			Vector3(x_pos, y_pos, 0.01),
+			Vector3(x_pos * 0.95, y_pos + 0.01, 0.01 - 0.065 * len_f)
+		]
+		var u_t_rads: Array[float] = [0.018 * len_f, 0.002]
+		dragon_root.add_child(_create_lofted_tube(u_t_pts, u_t_rads, 6, mat_teeth))
+
+		# Dente inferior apontando para cima
+		var l_t_pts: Array[Vector3] = [
+			Vector3(x_pos * 0.9, y_pos - 0.02, -0.10),
+			Vector3(x_pos * 0.9, y_pos - 0.01, -0.10 + 0.055 * len_f)
+		]
+		var l_t_rads: Array[float] = [0.016 * len_f, 0.002]
+		dragon_root.add_child(_create_lofted_tube(l_t_pts, l_t_rads, 6, mat_teeth))
+
+	# 5. LÍNGUA BÍFIDA BIFURCADA SAINDO PARA A FRENTE DA BOCA
+	var tongue_pts: Array[Vector3] = [
+		Vector3(0.0, 0.10, -0.04),
+		Vector3(0.0, 0.25, -0.05),
+		Vector3(0.0, 0.38, -0.04),
+		Vector3(0.0, 0.45, -0.02)
+	]
+	var tongue_rads: Array[float] = [0.065, 0.050, 0.035, 0.022]
+	dragon_root.add_child(_create_lofted_tube(tongue_pts, tongue_rads, 10, mat_tongue, 0.0, 0.0, Vector2(1.5, 0.5)))
+
+	# Bifurcação em duas pontas afiladas na ponta da língua
+	for side in [-1.0, 1.0]:
+		var fork_pts: Array[Vector3] = [
+			Vector3(0.0, 0.45, -0.02),
+			Vector3(side * 0.028, 0.52, -0.01),
+			Vector3(side * 0.045, 0.58, 0.0)
+		]
+		var fork_rads: Array[float] = [0.018, 0.011, 0.002]
+		dragon_root.add_child(_create_lofted_tube(fork_pts, fork_rads, 6, mat_tongue))
+
 
 # --- E. OLHO COMPOSTO INSETÓIDE (Facetado esmeralda com brilho) ---
 func _build_sculpted_compound_eye(root: Node3D) -> void:
