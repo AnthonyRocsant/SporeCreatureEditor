@@ -69,7 +69,6 @@ func _ready() -> void:
 	ui.skill_factory = skill_factory
 	ui.creature_serializer = creature_serializer
 	ui.procedural_gait = procedural_gait
-	ui.orbit_camera = $OrbitCamera as OrbitCamera
 	ui._setup_signals()
 
 	editor_state.mode_changed.connect(_on_mode_changed)

@@ -207,52 +207,6 @@ max_value = 2.0
 step = 0.05
 value = 1.0
 
-[node name="HSeparator3" type="HSeparator" parent="SculptPanel/Margin/VBox"]
-layout_mode = 2
-
-[node name="LblCameraViews" type="Label" parent="SculptPanel/Margin/VBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "Ângulos de Câmera (Atalhos 1, 2, 3, 4):"
-
-[node name="GridCameraViews" type="GridContainer" parent="SculptPanel/Margin/VBox"]
-layout_mode = 2
-columns = 2
-theme_override_constants/h_separation = 6
-theme_override_constants/v_separation = 6
-
-[node name="BtnViewSide" type="Button" parent="SculptPanel/Margin/VBox/GridCameraViews"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "👁 Perfil (1)"
-
-[node name="BtnViewTop" type="Button" parent="SculptPanel/Margin/VBox/GridCameraViews"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "👁 Topo (2)"
-
-[node name="BtnViewFront" type="Button" parent="SculptPanel/Margin/VBox/GridCameraViews"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "👁 Frente (3)"
-
-[node name="BtnViewFree" type="Button" parent="SculptPanel/Margin/VBox/GridCameraViews"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "👁 Livre (4)"
-
-[node name="HSeparator4" type="HSeparator" parent="SculptPanel/Margin/VBox"]
-layout_mode = 2
-
-[node name="BtnStraightenSpine" type="Button" parent="SculptPanel/Margin/VBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "✨ Endireitar Coluna (X = 0)"
-
 [node name="BtnResetSpine" type="Button" parent="SculptPanel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2

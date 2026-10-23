@@ -15,7 +15,6 @@ extends Control
 @export var skill_factory: SkillFactory
 @export var creature_serializer: CreatureSerializer
 @export var procedural_gait: ProceduralGait
-@export var orbit_camera: OrbitCamera
 
 # Referências da UI - HUD Top
 @onready var biomass_bar: ProgressBar = %BiomassBar
@@ -40,11 +39,6 @@ extends Control
 @onready var slider_vertebra_radius: HSlider = %SliderVertebraRadius
 @onready var lbl_vertebra_size_val: Label = %LblVertebraSizeVal
 @onready var slider_vertebra_size: HSlider = %SliderVertebraSize
-@onready var btn_view_side: Button = %BtnViewSide
-@onready var btn_view_top: Button = %BtnViewTop
-@onready var btn_view_front: Button = %BtnViewFront
-@onready var btn_view_free: Button = %BtnViewFree
-@onready var btn_straighten_spine: Button = %BtnStraightenSpine
 @onready var btn_reset_spine: Button = %BtnResetSpine
 
 # Referências da UI - Painel de Apêndices (Membros)
@@ -191,16 +185,6 @@ func _setup_signals() -> void:
 	# 4. Painel de Escultura (Pilar 1)
 	if btn_reset_spine and not btn_reset_spine.pressed.is_connected(_on_reset_spine_pressed):
 		btn_reset_spine.pressed.connect(_on_reset_spine_pressed)
-	if btn_straighten_spine and not btn_straighten_spine.pressed.is_connected(_on_straighten_spine_pressed):
-		btn_straighten_spine.pressed.connect(_on_straighten_spine_pressed)
-	if btn_view_side and not btn_view_side.pressed.is_connected(func(): if orbit_camera: orbit_camera.set_preset_view("lateral")):
-		btn_view_side.pressed.connect(func(): if orbit_camera: orbit_camera.set_preset_view("lateral"))
-	if btn_view_top and not btn_view_top.pressed.is_connected(func(): if orbit_camera: orbit_camera.set_preset_view("topo")):
-		btn_view_top.pressed.connect(func(): if orbit_camera: orbit_camera.set_preset_view("topo"))
-	if btn_view_front and not btn_view_front.pressed.is_connected(func(): if orbit_camera: orbit_camera.set_preset_view("frontal")):
-		btn_view_front.pressed.connect(func(): if orbit_camera: orbit_camera.set_preset_view("frontal"))
-	if btn_view_free and not btn_view_free.pressed.is_connected(func(): if orbit_camera: orbit_camera.set_preset_view("perspectiva")):
-		btn_view_free.pressed.connect(func(): if orbit_camera: orbit_camera.set_preset_view("perspectiva"))
 	if slider_vertebra_radius and not slider_vertebra_radius.value_changed.is_connected(_on_vertebra_slider_radius_changed):
 		slider_vertebra_radius.value_changed.connect(_on_vertebra_slider_radius_changed)
 	if slider_vertebra_size and not slider_vertebra_size.value_changed.is_connected(_on_vertebra_slider_size_changed):
@@ -1447,10 +1431,6 @@ func _on_remove_vertebra_pressed() -> void:
 func _on_reset_spine_pressed() -> void:
 	if spine_controller:
 		spine_controller.reset_spine()
-
-func _on_straighten_spine_pressed() -> void:
-	if spine_controller:
-		spine_controller.straighten_spine()
 
 func _on_vertebra_slider_radius_changed(value: float) -> void:
 	if not spine_controller:
