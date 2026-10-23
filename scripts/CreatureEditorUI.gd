@@ -61,7 +61,7 @@ extends Control
 @onready var btn_clear_parts: Button = %BtnClearParts
 
 var current_appendage_category: String = "all"
-var _active_appendage_id: String = "leg_claw"
+var _active_appendage_id: String = ""
 var _category_buttons: Dictionary = {}
 
 # Referências da UI - Painel de Pintura & Texturas
@@ -710,16 +710,21 @@ func _on_attachment_part_selected(part_data: Dictionary) -> void:
 		btn_delete_selected_part.disabled = false
 
 func _on_attachment_part_deselected() -> void:
+	if attachment_system and not attachment_system.active_part_scene:
+		_active_appendage_id = ""
+		_update_appendage_item_buttons_modulate()
 	if lbl_part_info and _active_appendage_id == "":
 		lbl_part_info.text = "Clique em um apêndice na criatura para selecioná-lo e alterar posição, ângulo ou tamanho."
 	if btn_delete_selected_part:
 		btn_delete_selected_part.disabled = true
 
 func _on_attachment_part_attached(_part_node: Node3D) -> void:
-	_active_appendage_id = ""
-	_update_appendage_item_buttons_modulate()
+	# Mantém a seleção ativa para colocação contínua (estilo carimbo)
 	if lbl_part_info:
-		lbl_part_info.text = "Apêndice fixado! Clique nele para selecioná-lo e alterar posição, ângulo ou tamanho."
+		if _active_appendage_id != "":
+			lbl_part_info.text = "Apêndice fixado! Continue clicando no corpo para adicionar mais, ou clique na lista / Esc para concluir."
+		else:
+			lbl_part_info.text = "Apêndice fixado! Clique nele para selecioná-lo e alterar posição, ângulo ou tamanho."
 
 # --- Catálogo Oficial de 20 Apêndices Categorizados (Bocas, Patas, Olhos, Rabos, Asas, Defesa) ---
 const APPENDAGE_CATALOG: Array[Dictionary] = [
@@ -1354,7 +1359,7 @@ func _select_catalog_part(item: Dictionary) -> void:
 			attachment_system.set_active_part(packed, item)
 
 	if lbl_part_info:
-		lbl_part_info.text = "%s %s: %s (Clique no corpo para fixar. Clique novamente na lista para cancelar)" % [item.icon, item.name, item.desc]
+		lbl_part_info.text = "%s %s: %s (Clique no corpo para fixar continuamente. Clique novamente na lista ou Esc para cancelar)" % [item.icon, item.name, item.desc]
 
 	_update_appendage_item_buttons_modulate()
 

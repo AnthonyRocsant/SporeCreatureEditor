@@ -539,6 +539,7 @@ func _reposition_selected_part_to_hit(pos: Vector3, normal: Vector3) -> void:
 	_update_selection_gizmo()
 
 func clear_active_part() -> void:
+	var had_active = (active_part_scene != null)
 	active_part_scene = null
 	active_part_info = {}
 	_has_valid_hit = false
@@ -549,6 +550,8 @@ func clear_active_part() -> void:
 	if is_instance_valid(_preview_mirrored_instance):
 		_preview_mirrored_instance.queue_free()
 		_preview_mirrored_instance = null
+	if had_active:
+		emit_signal("part_deselected")
 
 # --- Configuração de Peça Ativa e Previews ---
 
@@ -886,10 +889,10 @@ func _confirm_attachment() -> void:
 		}
 		creature_data.add_part(mirror_dict)
 
-	# Conforme solicitado: após o apêndice ser colocado, finaliza a colocação
-	# e limpa a seleção para que seu ângulo não mude acidentalmente até que
-	# o jogador clique nele expressamente!
-	clear_active_part()
+	# Modo Carimbo / Colocação Contínua:
+	# Mantém a peça ativa na agulha para permitir fixar múltiplos apêndices seguidos (ex: fileira de ossos/chifres).
+	# Garante apenas que a peça recém-fixada NÃO fique selecionada, evitando mudanças acidentais de ângulo/tamanho
+	# até que o usuário clique expressamente nela para editá-la.
 	deselect_part()
 
 	# Emite os sinais APÓS a finalização da colocação
