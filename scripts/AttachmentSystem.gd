@@ -684,8 +684,11 @@ func _update_raycast(screen_pos: Vector2) -> void:
 		hit_norm = -hit_norm
 	_last_hit_normal = hit_norm
 
-	_set_preview_visible(true)
-	_update_preview_transforms(_last_hit_position, _last_hit_normal)
+	if active_part_scene != null:
+		_set_preview_visible(true)
+		_update_preview_transforms(_last_hit_position, _last_hit_normal)
+	else:
+		_set_preview_visible(false)
 
 ## Alinha o apêndice conforme a categoria:
 ## - Se for PATA ("leg"), mantém a perna SEMPRE vertical apontando para o chão (-Y) e virada para frente (+Z)!
@@ -782,6 +785,7 @@ func _confirm_attachment() -> void:
 	if not active_part_scene or not creature_root or not _has_valid_hit:
 		return
 
+	var scene_res = active_part_scene
 	var p_type = str(active_part_info.get("type", "attack"))
 	var p_cat = str(active_part_info.get("category", p_type))
 	var p_tag = str(active_part_info.get("tag", ""))
@@ -796,13 +800,16 @@ func _confirm_attachment() -> void:
 	var mirror_id = base_id + "_mirror"
 	var will_mirror = symmetrical_mode and _has_valid_mirror_hit and creature_data.can_afford(cost * 2)
 
+	var main_xform = _preview_instance.global_transform if is_instance_valid(_preview_instance) else Transform3D.IDENTITY
+	var mirror_xform = _preview_mirrored_instance.global_transform if is_instance_valid(_preview_mirrored_instance) else Transform3D.IDENTITY
+
 	# 1. Instancia parte principal
-	var part = active_part_scene.instantiate() as Node3D
+	var part = scene_res.instantiate() as Node3D
 	parent_target.add_child(part)
 	if p_tag != "" and part.has_method("set_appendage_variant"):
 		part.call("set_appendage_variant", p_tag)
 	_apply_colors_to_part(part)
-	part.global_transform = _preview_instance.global_transform
+	part.global_transform = main_xform
 	part.scale = Vector3.ONE * current_scale
 	_attach_selection_collider(part, base_id)
 
@@ -820,7 +827,7 @@ func _confirm_attachment() -> void:
 		"type": p_type,
 		"category": p_cat,
 		"tag": p_tag,
-		"scene_path": active_part_scene.resource_path,
+		"scene_path": scene_res.resource_path,
 		"transform": part.transform,
 		"scale_factor": current_scale,
 		"rotation_rad": current_rotation,
@@ -835,17 +842,17 @@ func _confirm_attachment() -> void:
 		"is_mirrored": false
 	}
 	creature_data.add_part(main_dict)
-	emit_signal("part_attached", part)
 
 	# 2. Instancia parte espelhada se houver superfície válida e biomassa
+	var mirror_part: Node3D = null
 	var mirror_dict: Dictionary = {}
 	if will_mirror:
-		var mirror_part = active_part_scene.instantiate() as Node3D
+		mirror_part = scene_res.instantiate() as Node3D
 		parent_target.add_child(mirror_part)
 		if p_tag != "" and mirror_part.has_method("set_appendage_variant"):
 			mirror_part.call("set_appendage_variant", p_tag)
 		_apply_colors_to_part(mirror_part)
-		mirror_part.global_transform = _preview_mirrored_instance.global_transform
+		mirror_part.global_transform = mirror_xform
 		mirror_part.scale = Vector3.ONE * current_scale
 		_attach_selection_collider(mirror_part, mirror_id)
 
@@ -863,7 +870,7 @@ func _confirm_attachment() -> void:
 			"type": p_type,
 			"category": p_cat,
 			"tag": p_tag,
-			"scene_path": active_part_scene.resource_path,
+			"scene_path": scene_res.resource_path,
 			"transform": mirror_part.transform,
 			"scale_factor": current_scale,
 			"rotation_rad": -current_rotation,
@@ -878,13 +885,17 @@ func _confirm_attachment() -> void:
 			"is_mirrored": true
 		}
 		creature_data.add_part(mirror_dict)
-		emit_signal("part_attached", mirror_part)
 
 	# Conforme solicitado: após o apêndice ser colocado, finaliza a colocação
 	# e limpa a seleção para que seu ângulo não mude acidentalmente até que
 	# o jogador clique nele expressamente!
 	clear_active_part()
 	deselect_part()
+
+	# Emite os sinais APÓS a finalização da colocação
+	emit_signal("part_attached", part)
+	if mirror_part:
+		emit_signal("part_attached", mirror_part)
 
 ## Reconstrói um membro a partir de dados desserializados (usado pelo CreatureSerializer.gd)
 func reconstruct_part_from_dict(part_data: Dictionary) -> Node3D:

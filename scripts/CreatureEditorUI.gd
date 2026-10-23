@@ -716,7 +716,8 @@ func _on_attachment_part_deselected() -> void:
 		btn_delete_selected_part.disabled = true
 
 func _on_attachment_part_attached(_part_node: Node3D) -> void:
-	_deselect_catalog_part()
+	_active_appendage_id = ""
+	_update_appendage_item_buttons_modulate()
 	if lbl_part_info:
 		lbl_part_info.text = "Apêndice fixado! Clique nele para selecioná-lo e alterar posição, ângulo ou tamanho."
 
