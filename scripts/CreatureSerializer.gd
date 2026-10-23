@@ -268,6 +268,7 @@ func load_creature_from_json(file_path: String = DEFAULT_SAVE_PATH) -> bool:
 		for v_dict in spine_list:
 			if typeof(v_dict) == TYPE_DICTIONARY:
 				var pos = _array_to_vec3(v_dict.get("pos", [0.0, 0.2, 0.0]))
+				pos.x = 0.0 # Trava no plano sagital para manter a coluna 100% reta e simétrica
 				var rad = clampf(float(v_dict.get("radius", 0.45)), spine_manager.min_radius, spine_manager.max_radius)
 				var base_r = float(v_dict.get("base_radius", rad))
 				var sz = clampf(float(v_dict.get("size", 1.0)), spine_manager.min_vertebra_size, spine_manager.max_vertebra_size)

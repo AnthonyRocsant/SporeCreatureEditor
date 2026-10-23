@@ -255,17 +255,34 @@ func _input(event: InputEvent) -> void:
 					return
 
 func _handle_extremity_drag(screen_pos: Vector2) -> void:
-	if not _is_dragging_extremity or not camera or vertebrae.size() < 2:
+	if not _is_dragging_extremity or not camera or not camera.is_inside_tree() or not is_inside_tree() or vertebrae.size() < 2:
 		return
 
 	var ray_origin = camera.project_ray_origin(screen_pos)
 	var ray_normal = camera.project_ray_normal(screen_pos)
-	var hit = _drag_plane.intersects_ray(ray_origin, ray_normal)
-	if hit == null:
-		return
 
-	var local_hit = to_local(hit)
-	local_hit.x = clampf(local_hit.x, -max_lateral_x * 2.5, max_lateral_x * 2.5)
+	# Projeta o raio no plano sagital (X = 0) ou no plano de visualização da câmera
+	var sagittal_world_normal = global_transform.basis.x.normalized()
+	var sagittal_plane = Plane(sagittal_world_normal, global_position)
+	var local_hit: Vector3
+
+	if absf(ray_normal.dot(sagittal_world_normal)) > 0.08:
+		var sag_hit = sagittal_plane.intersects_ray(ray_origin, ray_normal)
+		if sag_hit != null:
+			local_hit = to_local(sag_hit)
+		else:
+			var hit = _drag_plane.intersects_ray(ray_origin, ray_normal)
+			if hit == null:
+				return
+			local_hit = to_local(hit)
+	else:
+		var hit = _drag_plane.intersects_ray(ray_origin, ray_normal)
+		if hit == null:
+			return
+		local_hit = to_local(hit)
+
+	# Trava absoluta: a coluna NUNCA desvia lateralmente no eixo X (plano sagital estrito X = 0)
+	local_hit.x = 0.0
 	local_hit.y = clampf(local_hit.y, min_height, max_height)
 	local_hit.z = clampf(local_hit.z, min_z, max_z)
 
@@ -277,17 +294,22 @@ func _handle_extremity_drag(screen_pos: Vector2) -> void:
 	if _drag_extremity_index == vertebrae.size() - 1:
 		var anchor_idx = vertebrae.size() - 2
 		_drag_anchor_pos = vertebrae[anchor_idx].pos
+		_drag_anchor_pos.x = 0.0
 		var diff = local_hit - _drag_anchor_pos
+		diff.x = 0.0
 		var dist = diff.length()
 		var pull_dir = diff.normalized() if dist > 0.001 else Vector3.BACK
+		pull_dir.x = 0.0
 
 		# 1. Extrusão na cauda: Adiciona nova vértebra quando puxado além do limiar
 		if dist > extrude_threshold and vertebrae.size() < MAX_VERTEBRAE:
 			if not creature_data or creature_data.can_afford(2):
 				vertebrae[selected_index].pos = _drag_anchor_pos + pull_dir * seg_dist
+				vertebrae[selected_index].pos.x = 0.0
 				var cur_rad = float(vertebrae[selected_index].radius)
 				var new_rad = clampf(cur_rad * 0.90, min_radius, max_radius)
 				var new_pos = vertebrae[selected_index].pos + pull_dir * (seg_dist * 0.75)
+				new_pos.x = 0.0
 				vertebrae.append({
 					"pos": new_pos,
 					"radius": new_rad,
@@ -297,9 +319,11 @@ func _handle_extremity_drag(screen_pos: Vector2) -> void:
 				selected_index = vertebrae.size() - 1
 				_drag_extremity_index = selected_index
 				_drag_anchor_pos = vertebrae[selected_index - 1].pos
+				_drag_anchor_pos.x = 0.0
 				var plane_normal = -camera.global_transform.basis.z.normalized()
 				_drag_plane = Plane(plane_normal, to_global(_drag_anchor_pos))
 
+				clean_sagittal_alignment()
 				_sync_spine_biomass()
 				_rebuild_gizmos()
 				emit_signal("vertebra_selected", selected_index)
@@ -313,9 +337,11 @@ func _handle_extremity_drag(screen_pos: Vector2) -> void:
 			selected_index = vertebrae.size() - 1
 			_drag_extremity_index = selected_index
 			_drag_anchor_pos = vertebrae[selected_index - 1].pos
+			_drag_anchor_pos.x = 0.0
 			var plane_normal = -camera.global_transform.basis.z.normalized()
 			_drag_plane = Plane(plane_normal, to_global(_drag_anchor_pos))
 
+			clean_sagittal_alignment()
 			_sync_spine_biomass()
 			_rebuild_gizmos()
 			emit_signal("vertebra_selected", selected_index)
@@ -326,6 +352,7 @@ func _handle_extremity_drag(screen_pos: Vector2) -> void:
 		# 3. Orientação da ponta da cauda na direção puxada
 		var tip_dist = clampf(dist, seg_dist * 0.7, seg_dist * 1.3)
 		vertebrae[selected_index].pos = _drag_anchor_pos + pull_dir * tip_dist
+		vertebrae[selected_index].pos.x = 0.0
 		_update_gizmos()
 		generate_mesh(false)
 		emit_signal("spine_modified")
@@ -333,17 +360,22 @@ func _handle_extremity_drag(screen_pos: Vector2) -> void:
 	# === CASO 2: PUXANDO O INÍCIO DA COLUNA (CABEÇA / PESCOÇO) ===
 	elif _drag_extremity_index == 0:
 		_drag_anchor_pos = vertebrae[1].pos
+		_drag_anchor_pos.x = 0.0
 		var diff = local_hit - _drag_anchor_pos
+		diff.x = 0.0
 		var dist = diff.length()
 		var pull_dir = diff.normalized() if dist > 0.001 else Vector3.FORWARD
+		pull_dir.x = 0.0
 
 		# 1. Extrusão na cabeça: Insere nova vértebra no índice 0
 		if dist > extrude_threshold and vertebrae.size() < MAX_VERTEBRAE:
 			if not creature_data or creature_data.can_afford(2):
 				vertebrae[0].pos = _drag_anchor_pos + pull_dir * seg_dist
+				vertebrae[0].pos.x = 0.0
 				var cur_rad = float(vertebrae[0].radius)
 				var new_rad = clampf(cur_rad * 0.92, min_radius, max_radius)
 				var new_pos = vertebrae[0].pos + pull_dir * (seg_dist * 0.75)
+				new_pos.x = 0.0
 				vertebrae.insert(0, {
 					"pos": new_pos,
 					"radius": new_rad,
@@ -354,9 +386,11 @@ func _handle_extremity_drag(screen_pos: Vector2) -> void:
 				selected_index = 0
 				_drag_extremity_index = 0
 				_drag_anchor_pos = vertebrae[1].pos
+				_drag_anchor_pos.x = 0.0
 				var plane_normal = -camera.global_transform.basis.z.normalized()
 				_drag_plane = Plane(plane_normal, to_global(_drag_anchor_pos))
 
+				clean_sagittal_alignment()
 				_sync_spine_biomass()
 				_rebuild_gizmos()
 				emit_signal("vertebra_selected", selected_index)
@@ -371,9 +405,11 @@ func _handle_extremity_drag(screen_pos: Vector2) -> void:
 			selected_index = 0
 			_drag_extremity_index = 0
 			_drag_anchor_pos = vertebrae[1].pos
+			_drag_anchor_pos.x = 0.0
 			var plane_normal = -camera.global_transform.basis.z.normalized()
 			_drag_plane = Plane(plane_normal, to_global(_drag_anchor_pos))
 
+			clean_sagittal_alignment()
 			_sync_spine_biomass()
 			_rebuild_gizmos()
 			emit_signal("vertebra_selected", selected_index)
@@ -384,6 +420,7 @@ func _handle_extremity_drag(screen_pos: Vector2) -> void:
 		# 3. Orientação da cabeça na direção puxada
 		var tip_dist = clampf(dist, seg_dist * 0.7, seg_dist * 1.3)
 		vertebrae[0].pos = _drag_anchor_pos + pull_dir * tip_dist
+		vertebrae[0].pos.x = 0.0
 		_update_gizmos()
 		generate_mesh(false)
 		emit_signal("spine_modified")
@@ -392,15 +429,24 @@ func _finalize_extremity_drag() -> void:
 	if vertebrae.size() >= 2:
 		if selected_index == vertebrae.size() - 1:
 			var prev_pos = vertebrae[selected_index - 1].pos
+			prev_pos.x = 0.0
 			var diff = vertebrae[selected_index].pos - prev_pos
+			diff.x = 0.0
 			var pull_dir = diff.normalized() if diff.length_squared() > 0.001 else Vector3.BACK
+			pull_dir.x = 0.0
 			vertebrae[selected_index].pos = prev_pos + pull_dir * base_vertebra_distance
+			vertebrae[selected_index].pos.x = 0.0
 		elif selected_index == 0:
 			var next_pos = vertebrae[1].pos
+			next_pos.x = 0.0
 			var diff = vertebrae[0].pos - next_pos
+			diff.x = 0.0
 			var pull_dir = diff.normalized() if diff.length_squared() > 0.001 else Vector3.FORWARD
+			pull_dir.x = 0.0
 			vertebrae[0].pos = next_pos + pull_dir * base_vertebra_distance
+			vertebrae[0].pos.x = 0.0
 
+	clean_sagittal_alignment()
 	_update_gizmos()
 	generate_mesh(true)
 	emit_signal("spine_modified")
@@ -469,18 +515,22 @@ func adjust_vertebra_size(idx: int, delta: float) -> void:
 	var scale_ratio = new_size / old_size
 	vertebrae[idx]["size"] = new_size
 	vertebrae[idx].radius = clampf(float(vertebrae[idx].radius) * scale_ratio, min_radius, max_radius)
+	vertebrae[idx].pos.x = 0.0
 
 	for i in range(idx + 1, vertebrae.size()):
 		var target_dist = _get_max_segment_distance(i, i - 1)
 		var prev_pos = vertebrae[i - 1].pos
-		var dir = (vertebrae[i].pos - prev_pos).normalized()
-		if dir.length_squared() < 0.001:
-			dir = Vector3.BACK
+		prev_pos.x = 0.0
+		var diff = vertebrae[i].pos - prev_pos
+		diff.x = 0.0
+		var dir = diff.normalized() if diff.length_squared() > 0.001 else Vector3.BACK
+		dir.x = 0.0
 		vertebrae[i].pos = prev_pos + dir * target_dist
-		vertebrae[i].pos.x = clampf(vertebrae[i].pos.x, -max_lateral_x, max_lateral_x)
+		vertebrae[i].pos.x = 0.0
 		vertebrae[i].pos.y = clampf(vertebrae[i].pos.y, min_height, max_height)
 		vertebrae[i].pos.z = clampf(vertebrae[i].pos.z, min_z, max_z)
 
+	clean_sagittal_alignment()
 	_sync_spine_biomass()
 	_update_gizmos()
 	generate_mesh(true)
@@ -555,9 +605,10 @@ func add_vertebra() -> void:
 	var last_v = vertebrae[last_idx]
 	var second_last_pos = vertebrae[maxi(0, last_idx - 1)].pos
 
-	var extend_dir = (last_v.pos - second_last_pos).normalized()
-	if extend_dir.length_squared() < 0.001:
-		extend_dir = Vector3.BACK
+	var extend_diff = last_v.pos - second_last_pos
+	extend_diff.x = 0.0
+	var extend_dir = extend_diff.normalized() if extend_diff.length_squared() > 0.001 else Vector3.BACK
+	extend_dir.x = 0.0
 
 	var seg_dist = base_vertebra_distance * 0.85
 	var new_pos = last_v.pos + extend_dir * seg_dist
@@ -566,9 +617,10 @@ func add_vertebra() -> void:
 		var shift_z = min_z - new_pos.z
 		for v in vertebrae:
 			v.pos.z = clampf(v.pos.z + shift_z, min_z, max_z)
+			v.pos.x = 0.0
 		new_pos.z = min_z
 
-	new_pos.x = clampf(new_pos.x, -max_lateral_x, max_lateral_x)
+	new_pos.x = 0.0
 	new_pos.y = clampf(new_pos.y, min_height, max_height)
 	new_pos.z = clampf(new_pos.z, min_z, max_z)
 
@@ -581,6 +633,7 @@ func add_vertebra() -> void:
 	}
 	vertebrae.append(new_vertebra)
 	selected_index = vertebrae.size() - 1
+	clean_sagittal_alignment()
 	_sync_spine_biomass()
 	_rebuild_gizmos()
 	generate_mesh(true)
@@ -614,6 +667,11 @@ func reset_spine() -> void:
 	hovered_index = -1
 	generate_mesh(true)
 	emit_signal("spine_modified")
+
+## Garante alinhamento rigoroso no plano sagital (X = 0) para todas as vértebras
+func clean_sagittal_alignment() -> void:
+	for v in vertebrae:
+		v.pos.x = 0.0
 
 ## Alinha e endireita as vértebras perfeitamente na linha média (X = 0) com suave arco dorsal natural
 ## Preserva todos os raios (grossuras) e corrige qualquer torção ou deformação acidental!
@@ -763,6 +821,7 @@ func sample_spine_basis(u: float) -> Basis:
 # --- Geração Procedural da Malha (SurfaceTool & Lofting Catmull-Rom) ---
 
 func generate_mesh(update_collider: bool = true) -> void:
+	clean_sagittal_alignment()
 	if not body_mesh_instance or vertebrae.size() < 2:
 		return
 
